@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Integrations — MikroTik MCP docs</title>
+<meta name="description" content="Connect MikroTik MCP to Claude Desktop, the MCP Inspector, and MCPO (MCP-to-OpenAPI). Config snippets, one-liners, and curl examples straight from the source docs." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  /* Integration cards */
+  .integrations-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    margin: 28px 0 48px;
+  }
+  .int-card {
+    background: var(--bg-1); border: 1px solid var(--line);
+    border-radius: var(--rad-lg); padding: 22px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .int-card .logo {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: var(--bg-3); border: 1px solid var(--line);
+    display: grid; place-items: center;
+    font-family: var(--mono); font-size: 11px; color: var(--amber);
+  }
+  .int-card h4 { font-size: 17px; }
+  .int-card p { font-size: 13px; }
+  .int-card .meta {
+    display: flex; gap: 10px; font-family: var(--mono);
+    font-size: 10.5px; color: var(--ink-mute); margin-top: auto; padding-top: 12px;
+    border-top: 1px dashed var(--line);
+  }
+  .int-card .meta span:first-child { color: var(--lime); }
+
+  /* Path/req row */
+  .endpoint {
+    display: grid; grid-template-columns: 70px 1fr;
+    background: var(--bg-1); border: 1px solid var(--line);
+    border-radius: var(--rad); padding: 12px 14px;
+    align-items: center; margin: 8px 0;
+    font-family: var(--mono); font-size: 13px;
+  }
+  .endpoint .method {
+    font-size: 11px; letter-spacing: 0.06em; color: var(--lime);
+    padding: 3px 8px; background: rgba(182,242,92,0.07);
+    border-radius: 3px; text-align: center; border: 1px solid rgba(182,242,92,0.2);
+  }
+  .endpoint .path { color: var(--ink); padding-left: 14px; }
+  .endpoint .path .ph { color: var(--amber); }
+
+  @media (max-width: 820px) {
+    .integrations-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="../index.html" class="brand">
+    <span class="brand-mark">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6">
+        <rect x="2.5" y="9" width="19" height="8.5" rx="1" stroke="var(--amber)"/>
+        <line x1="6" y1="13.25" x2="9" y2="13.25" stroke="var(--lime)"/>
+        <line x1="11" y1="13.25" x2="14" y2="13.25" stroke="var(--lime)"/>
+        <line x1="16" y1="13.25" x2="18" y2="13.25" stroke="var(--lime)"/>
+        <line x1="7" y1="9" x2="5" y2="4" stroke="var(--amber)"/>
+        <line x1="12" y1="9" x2="12" y2="3" stroke="var(--amber)"/>
+        <line x1="17" y1="9" x2="19" y2="4" stroke="var(--amber)"/>
+        <circle cx="5" cy="4" r="0.9" fill="var(--amber)" stroke="none"/>
+        <circle cx="12" cy="3" r="0.9" fill="var(--amber)" stroke="none"/>
+        <circle cx="19" cy="4" r="0.9" fill="var(--amber)" stroke="none"/>
+      </svg>
+    </span>
+    MikroTik MCP <span class="brand-tag">docs</span>
+  </a>
+  <div class="nav-links">
+    <a href="../index.html#what">Overview</a>
+    <a href="../index.html#capabilities">Capabilities</a>
+    <a href="index.html" class="active">Docs</a>
+    <a href="reference.html">Reference</a>
+    <a href="examples.html">Examples</a>
+  </div>
+  <div class="nav-right">
+    <span class="pill"><span class="dot"></span> MIT licensed</span>
+    <a class="btn" href="https://github.com/jeff-nasseri/mikrotik-mcp" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</nav>
+
+<!-- DOCS LAYOUT -->
+<div class="docs">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h6>Getting started</h6>
+    <ul>
+      <li><a href="index.html">Installation</a></li>
+      <li><a href="index.html#testing">Testing</a></li>
+      <li><a href="index.html#context">Context optimization</a></li>
+    </ul>
+    <h6>Integrations</h6>
+    <ul>
+      <li><a href="configure.html#claude" class="active">Claude Desktop</a></li>
+      <li><a href="configure.html#inspector">MCP Inspector</a></li>
+      <li><a href="configure.html#mcpo">MCPO (REST API)</a></li>
+    </ul>
+    <h6>API reference</h6>
+    <ul>
+      <li><a href="reference.html#vlan">VLAN</a></li>
+      <li><a href="reference.html#firewall">Firewall</a></li>
+      <li><a href="reference.html#nat">NAT</a></li>
+      <li><a href="reference.html#dhcp">DHCP</a></li>
+      <li><a href="reference.html#dns">DNS</a></li>
+      <li><a href="reference.html#wireguard">WireGuard</a></li>
+      <li><a href="reference.html#wireless">Wireless</a></li>
+      <li><a href="reference.html">All categories →</a></li>
+    </ul>
+    <h6>Examples</h6>
+    <ul>
+      <li><a href="examples.html">Usage examples</a></li>
+      <li><a href="examples.html#workflows">Complete workflows</a></li>
+    </ul>
+    <h6>Project</h6>
+    <ul>
+      <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/docs/contributing.md" target="_blank" rel="noopener">Contributing</a></li>
+      <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/LICENSE" target="_blank" rel="noopener">License</a></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="doc-main">
+    <div class="crumbs">
+      <a href="../index.html">MikroTik MCP</a> <span>/</span>
+      <a href="index.html">Docs</a> <span>/</span>
+      <span style="color:var(--ink);opacity:1">Integrations</span>
+    </div>
+    <h1 class="doc-title">Integrations</h1>
+    <p class="doc-lede">
+      Three first-class ways to talk to the server: an AI desktop client (Claude),
+      an interactive testing harness (MCP Inspector), and a REST shim (MCPO) for
+      anything that doesn't speak MCP natively.
+    </p>
+
+    <div class="integrations-grid">
+      <div class="int-card">
+        <div class="logo">CD</div>
+        <h4>Claude Desktop</h4>
+        <p>Native MCP support. Drop a JSON snippet into the config file, restart, and the tools appear in the conversation.</p>
+        <div class="meta"><span>● ready</span><span>stdio · uvx</span></div>
+      </div>
+      <div class="int-card">
+        <div class="logo">MI</div>
+        <h4>MCP Inspector</h4>
+        <p>Browser-based tool catalog and ad-hoc invoker. Best way to learn the API without a model in the loop.</p>
+        <div class="meta"><span>● ready</span><span>npx · UI</span></div>
+      </div>
+      <div class="int-card">
+        <div class="logo">MO</div>
+        <h4>MCPO (REST shim)</h4>
+        <p>Exposes every tool as a REST endpoint with OpenAPI docs. Use for ChatGPT actions, n8n, curl scripts.</p>
+        <div class="meta"><span>● ready</span><span>HTTP · OpenAPI</span></div>
+      </div>
+    </div>
+
+    <!-- CLAUDE -->
+    <h2 id="claude">Claude Desktop</h2>
+    <p>Claude Desktop reads its MCP server list from
+      <code>claude_desktop_config.json</code> —
+      <code>~/Library/Application Support/Claude/</code> on macOS, and
+      <code>%APPDATA%\Claude\</code> on Windows. Add the server, restart, and Claude will
+      discover the tools on its next session.</p>
+
+    <div class="code-header"><span>claude_desktop_config.json</span><button class="copy-btn">Copy</button></div>
+    <pre class="code">{
+  <span class="k">"mcpServers"</span>: {
+    <span class="k">"mikrotik"</span>: {
+      <span class="k">"command"</span>: <span class="s">"uvx"</span>,
+      <span class="k">"args"</span>: [
+        <span class="s">"mcp-server-mikrotik"</span>,
+        <span class="s">"--host"</span>,     <span class="s">"&lt;HOST&gt;"</span>,
+        <span class="s">"--username"</span>, <span class="s">"&lt;USERNAME&gt;"</span>,
+        <span class="s">"--password"</span>, <span class="s">"&lt;PASSWORD&gt;"</span>,
+        <span class="s">"--port"</span>,     <span class="s">"22"</span>
+      ]
+    }
+  }
+}</pre>
+
+    <div class="callout">
+      <span class="icon">SECURITY</span>
+      <div>
+        The model never sees your password — only the tool catalog and parameter schemas.
+        That said, the password lives in the config file in plain text. Use a dedicated, scoped
+        RouterOS user rather than <code>admin</code> for day-to-day operation.
+      </div>
+    </div>
+
+    <h3 id="claude-verify">Verifying the connection</h3>
+    <p>After restarting Claude Desktop, look for the connector indicator in the prompt box.
+      A first easy test:</p>
+    <ul>
+      <li>Ask: <em>"List my VLAN interfaces."</em></li>
+      <li>Claude should call <code>mikrotik_list_vlan_interfaces</code> with empty args and surface the JSON result.</li>
+      <li>If the call fails with a connection error, double-check <code>--host</code>, the SSH user's policies, and that <code>/ip ssh</code> is allowed on the device.</li>
+    </ul>
+
+    <!-- INSPECTOR -->
+    <h2 id="inspector">MCP Inspector</h2>
+    <p>The Inspector is the official debugging tool for MCP servers. It launches a server, connects to it,
+      and gives you a browser UI to browse the tool catalog and invoke them by hand. No LLM involved —
+      pure introspection.</p>
+
+    <h3 id="inspector-quick">Quick one-liner</h3>
+    <div class="code-header"><span># Inspector + server in one shot</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="p">$</span> npx @modelcontextprotocol/inspector \
+    uvx mcp-server-mikrotik \
+    <span class="k">--host</span> <span class="s">&lt;HOST&gt;</span> \
+    <span class="k">--username</span> <span class="s">&lt;USERNAME&gt;</span> \
+    <span class="k">--password</span> <span class="s">&lt;PASSWORD&gt;</span> \
+    <span class="k">--port</span> <span class="n">22</span></pre>
+
+    <h3 id="inspector-config">Against an mcp-config.json</h3>
+    <p>If you've already prepared a config file (recommended for MCPO too), install the inspector globally
+      and point it at the file:</p>
+
+    <div class="code-header"><span># Persistent config</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="p">$</span> npm install <span class="k">-g</span> @modelcontextprotocol/inspector
+<span class="p">$</span> <span class="k">cp</span> mcp-config.json.example mcp-config.json
+<span class="p">$</span> nano mcp-config.json   <span class="c"># edit credentials</span>
+<span class="p">$</span> mcp-inspector <span class="k">--config</span> mcp-config.json <span class="k">--server</span> mikrotik-mcp-server</pre>
+
+    <p>Open the URL it prints. The left pane lists every tool; clicking one opens a form for its arguments
+      and a "Call" button. The response JSON appears beneath. Excellent for learning the schema before
+      you wire a real client.</p>
+
+    <!-- MCPO -->
+    <h2 id="mcpo">MCPO — REST API</h2>
+    <p>MCPO ("MCP-to-OpenAPI") wraps any MCP server in a FastAPI shell. Each tool becomes a POST endpoint,
+      and you get auto-generated OpenAPI docs at <code>/docs</code>. Use this for:</p>
+    <ul>
+      <li>ChatGPT custom actions (which expect OpenAPI URLs).</li>
+      <li>n8n / Make / Zapier-style automation.</li>
+      <li><code>curl</code> scripts and CI jobs.</li>
+    </ul>
+
+    <div class="callout">
+      <span class="icon">PREREQ</span>
+      <div>
+        Python 3.8+, a MikroTik MCP server already set up, and the <code>uv</code> package manager
+        (recommended) or <code>pip</code>.
+      </div>
+    </div>
+
+    <h3 id="mcpo-install">Install</h3>
+    <div class="code-header"><span># pick one</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="c"># Option 1 — uvx (recommended, no install)</span>
+<span class="p">$</span> uvx mcpo <span class="k">--help</span>
+
+<span class="c"># Option 2 — pip</span>
+<span class="p">$</span> pip install mcpo</pre>
+
+    <h3 id="mcpo-config">Config file</h3>
+    <p>Create <code>mcp-config.json</code> in your project directory. Adjust the connection parameters
+      (<code>host</code>, <code>username</code>, <code>password</code>, <code>port</code>) to match your setup:</p>
+
+    <div class="code-header"><span>mcp-config.json</span><button class="copy-btn">Copy</button></div>
+    <pre class="code">{
+  <span class="k">"mcpServers"</span>: {
+    <span class="k">"mikrotik-mcp-server"</span>: {
+      <span class="k">"command"</span>: <span class="s">"python"</span>,
+      <span class="k">"args"</span>: [
+        <span class="s">"src/mcp_mikrotik/server.py"</span>,
+        <span class="s">"--password"</span>, <span class="s">"admin"</span>,
+        <span class="s">"--host"</span>,     <span class="s">"192.168.1.1"</span>,
+        <span class="s">"--port"</span>,     <span class="s">"22"</span>,
+        <span class="s">"--username"</span>, <span class="s">"admin"</span>
+      ],
+      <span class="k">"env"</span>: {}
+    }
+  }
+}</pre>
+
+    <h3 id="mcpo-run">Run the server</h3>
+    <div class="code-header"><span># With API-key auth (recommended)</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="c"># With API key authentication</span>
+<span class="p">$</span> uvx mcpo <span class="k">--port</span> <span class="n">8000</span> \
+    <span class="k">--api-key</span> <span class="s">"your-secret-key"</span> \
+    <span class="k">--config</span> ./mcp-config.json
+
+<span class="c"># Or without auth (not recommended for production)</span>
+<span class="p">$</span> uvx mcpo <span class="k">--port</span> <span class="n">8000</span> <span class="k">--config</span> ./mcp-config.json</pre>
+
+    <p>You'll see two URLs in the startup log:</p>
+    <div class="endpoint">
+      <span class="method">SERVE</span>
+      <span class="path">http://0.0.0.0:8000</span>
+    </div>
+    <div class="endpoint">
+      <span class="method">DOCS</span>
+      <span class="path">http://localhost:8000/docs</span>
+    </div>
+
+    <h3 id="mcpo-call">Calling a tool</h3>
+    <p>Each tool is exposed at <code>/&lt;server-name&gt;/&lt;tool-name&gt;</code>. POST a JSON body containing the
+      tool's arguments.</p>
+
+    <div class="code-header"><span># curl — list IP addresses</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="p">$</span> curl <span class="k">-X</span> POST http://localhost:8000/mikrotik-mcp-server/mikrotik_list_ip_addresses \
+    <span class="k">-H</span> <span class="s">"Authorization: Bearer your-secret-key"</span> \
+    <span class="k">-H</span> <span class="s">"Content-Type: application/json"</span> \
+    <span class="k">-d</span> <span class="s">'{}'</span></pre>
+
+    <div class="endpoint">
+      <span class="method">POST</span>
+      <span class="path">/mikrotik-mcp-server/<span class="ph">mikrotik_list_ip_addresses</span></span>
+    </div>
+    <div class="endpoint">
+      <span class="method">POST</span>
+      <span class="path">/mikrotik-mcp-server/<span class="ph">mikrotik_create_filter_rule</span></span>
+    </div>
+    <div class="endpoint">
+      <span class="method">POST</span>
+      <span class="path">/mikrotik-mcp-server/<span class="ph">mikrotik_create_vlan_interface</span></span>
+    </div>
+
+    <div class="callout tip">
+      <span class="icon">TIP</span>
+      <div>
+        The Swagger UI at <code>/docs</code> auto-generates a "Try it out" form for every tool — much faster
+        than handcrafting <code>curl</code> commands when you're exploring.
+      </div>
+    </div>
+
+    <div class="pager">
+      <a href="index.html">
+        <span class="label">← previous</span>
+        <span class="target">Installation</span>
+      </a>
+      <a href="reference.html" class="next">
+        <span class="label">next →</span>
+        <span class="target">API reference</span>
+      </a>
+    </div>
+  </main>
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h6>On this page</h6>
+    <ul>
+      <li><a href="#claude">Claude Desktop</a></li>
+      <li><a href="#claude-verify">— Verifying</a></li>
+      <li><a href="#inspector">MCP Inspector</a></li>
+      <li><a href="#inspector-quick">— Quick one-liner</a></li>
+      <li><a href="#inspector-config">— With config file</a></li>
+      <li><a href="#mcpo">MCPO — REST API</a></li>
+      <li><a href="#mcpo-install">— Install</a></li>
+      <li><a href="#mcpo-config">— Config</a></li>
+      <li><a href="#mcpo-run">— Run</a></li>
+      <li><a href="#mcpo-call">— Calling a tool</a></li>
+    </ul>
+  </aside>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div>
+      <div class="brand" style="margin-bottom: 12px;">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="2.5" y="9" width="19" height="8.5" rx="1" stroke="var(--amber)"/>
+            <line x1="6" y1="13.25" x2="9" y2="13.25" stroke="var(--lime)"/>
+            <line x1="11" y1="13.25" x2="14" y2="13.25" stroke="var(--lime)"/>
+            <line x1="16" y1="13.25" x2="18" y2="13.25" stroke="var(--lime)"/>
+          </svg>
+        </span>
+        MikroTik MCP
+      </div>
+      <p style="font-size:13px;max-width:280px;">An open-source MCP server bridging large language models with RouterOS devices. Not affiliated with MikroTik.</p>
+      <p style="margin-top: 14px; font-size: 12px; color: var(--ink-mute);">MIT License · © 2026 jeff-nasseri &amp; contributors</p>
+    </div>
+    <div>
+      <h5>Docs</h5>
+      <ul>
+        <li><a href="index.html">Installation</a></li>
+        <li><a href="configure.html">Integrations</a></li>
+        <li><a href="reference.html">API reference</a></li>
+        <li><a href="examples.html">Examples</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Source</h5>
+      <ul>
+        <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/LICENSE" target="_blank" rel="noopener">License</a></li>
+        <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/docs/contributing.md" target="_blank" rel="noopener">Contributing</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Related</h5>
+      <ul>
+        <li><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol</a></li>
+        <li><a href="https://help.mikrotik.com/docs" target="_blank" rel="noopener">RouterOS docs</a></li>
+        <li><a href="https://github.com/modelcontextprotocol/inspector" target="_blank" rel="noopener">MCP Inspector</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const code = btn.closest('.code-header').nextElementSibling.innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => btn.textContent = orig, 1200);
+      });
+    });
+  });
+</script>
+</body>
+</html>

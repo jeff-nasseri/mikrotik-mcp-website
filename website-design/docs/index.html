@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Installation — MikroTik MCP docs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="../index.html" class="brand">
+    <span class="brand-mark">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6">
+        <rect x="2.5" y="9" width="19" height="8.5" rx="1" stroke="var(--amber)"/>
+        <line x1="6" y1="13.25" x2="9" y2="13.25" stroke="var(--lime)"/>
+        <line x1="11" y1="13.25" x2="14" y2="13.25" stroke="var(--lime)"/>
+        <line x1="16" y1="13.25" x2="18" y2="13.25" stroke="var(--lime)"/>
+        <line x1="7" y1="9" x2="5" y2="4" stroke="var(--amber)"/>
+        <line x1="12" y1="9" x2="12" y2="3" stroke="var(--amber)"/>
+        <line x1="17" y1="9" x2="19" y2="4" stroke="var(--amber)"/>
+        <circle cx="5" cy="4" r="0.9" fill="var(--amber)" stroke="none"/>
+        <circle cx="12" cy="3" r="0.9" fill="var(--amber)" stroke="none"/>
+        <circle cx="19" cy="4" r="0.9" fill="var(--amber)" stroke="none"/>
+      </svg>
+    </span>
+    MikroTik MCP <span class="brand-tag">docs</span>
+  </a>
+  <div class="nav-links">
+    <a href="../index.html#what">Overview</a>
+    <a href="../index.html#capabilities">Capabilities</a>
+    <a href="index.html" class="active">Docs</a>
+    <a href="reference.html">Reference</a>
+  </div>
+  <div class="nav-right">
+    <span class="pill"><span class="dot"></span> v1.0</span>
+    <a class="btn" href="https://github.com/jeff-nasseri/mikrotik-mcp" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</nav>
+
+<!-- DOCS LAYOUT -->
+<div class="docs" data-screen-label="02 Docs — Installation">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h6>Getting started</h6>
+    <ul>
+      <li><a href="index.html" class="active">Installation</a></li>
+      <li><a href="index.html#testing">Testing</a></li>
+      <li><a href="index.html#context">Context optimization</a></li>
+    </ul>
+    <h6>Integrations</h6>
+    <ul>
+      <li><a href="configure.html#claude">Claude Desktop</a></li>
+      <li><a href="configure.html#inspector">MCP Inspector</a></li>
+      <li><a href="configure.html#mcpo">MCPO (REST API)</a></li>
+    </ul>
+    <h6>API reference</h6>
+    <ul>
+      <li><a href="reference.html#vlan">VLAN</a></li>
+      <li><a href="reference.html#firewall">Firewall</a></li>
+      <li><a href="reference.html#nat">NAT</a></li>
+      <li><a href="reference.html#dhcp">DHCP</a></li>
+      <li><a href="reference.html#dns">DNS</a></li>
+      <li><a href="reference.html#routes">Routes</a></li>
+      <li><a href="reference.html#wireguard">WireGuard</a></li>
+      <li><a href="reference.html#users">Users</a></li>
+      <li><a href="reference.html">All categories →</a></li>
+    </ul>
+    <h6>Project</h6>
+    <ul>
+      <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
+      <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/LICENSE" target="_blank" rel="noopener">License</a></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="doc-main">
+    <div class="crumbs">
+      <a href="../index.html">MikroTik MCP</a> <span>/</span>
+      <a href="index.html">Docs</a> <span>/</span>
+      <span style="color:var(--ink);opacity:1">Installation</span>
+    </div>
+    <h1 class="doc-title">Installation</h1>
+    <p class="doc-lede">
+      Three ways in: a Docker container (recommended), a manual Python install,
+      or running the published image with HTTP transports for remote agents.
+      Pick whichever matches your environment — all three speak the same MCP protocol.
+    </p>
+
+    <div class="callout">
+      <span class="icon">PRE-FLIGHT</span>
+      <div>
+        You'll need a RouterOS device with API access enabled, a username with write policy,
+        and (ideally) SSH key auth. Default port is <code>22</code>.
+      </div>
+    </div>
+
+    <h2 id="prereq">Prerequisites</h2>
+    <ul>
+      <li><strong>Python 3.8+</strong> — only if you're not running via Docker.</li>
+      <li><strong>MikroTik RouterOS device</strong> with API access enabled.</li>
+      <li><strong>Network reachability</strong> from your machine to the router's SSH port.</li>
+      <li><strong>An MCP-capable client</strong> — Claude Desktop, MCP Inspector, or any tool that speaks MCP.</li>
+    </ul>
+
+    <!-- DOCKER -->
+    <h2 id="docker">Docker (recommended)</h2>
+    <p>The fastest path. The image bundles Python, the server, and all dependencies — you just provide credentials.</p>
+
+    <div class="code-header"><span>1 · Clone &amp; build</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="p">$</span> git clone https://github.com/jeff-nasseri/mikrotik-mcp.git
+<span class="p">$</span> <span class="k">cd</span> mikrotik-mcp
+<span class="p">$</span> docker build <span class="k">-t</span> mikrotik-mcp .</pre>
+
+    <h3 id="stdio-docker">Run with stdio (IDE / desktop client)</h3>
+    <p>stdio transport is what Claude Desktop, Cursor, and most IDE integrations expect. The container reads
+      MCP messages from stdin and writes responses to stdout — short-lived, one process per client.</p>
+
+    <div class="code-header"><span>~/.cursor/mcp.json &nbsp;or&nbsp; claude_desktop_config.json</span><button class="copy-btn">Copy</button></div>
+    <pre class="code">{
+  <span class="k">"mcpServers"</span>: {
+    <span class="k">"mikrotik-mcp-server"</span>: {
+      <span class="k">"command"</span>: <span class="s">"docker"</span>,
+      <span class="k">"args"</span>: [
+        <span class="s">"run"</span>, <span class="s">"--rm"</span>, <span class="s">"-i"</span>,
+        <span class="s">"-e"</span>, <span class="s">"MIKROTIK_HOST=192.168.88.1"</span>,
+        <span class="s">"-e"</span>, <span class="s">"MIKROTIK_USERNAME=sshuser"</span>,
+        <span class="s">"-e"</span>, <span class="s">"MIKROTIK_PASSWORD=your_password"</span>,
+        <span class="s">"-e"</span>, <span class="s">"MIKROTIK_PORT=22"</span>,
+        <span class="s">"mikrotik-mcp"</span>
+      ]
+    }
+  }
+}</pre>
+
+    <h3 id="sse-docker">Run with SSE or streamable HTTP</h3>
+    <p>For remote agents, REST consumers, and anything that isn't on the same machine.
+      Exposes a long-running HTTP server with a <code>/health</code> probe.</p>
+
+    <div class="code-header"><span># SSE on port 8000</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="p">$</span> docker run <span class="k">--rm -p</span> 8000:8000 \
+    <span class="k">-e</span> MIKROTIK_HOST=<span class="s">192.168.88.1</span> \
+    <span class="k">-e</span> MIKROTIK_USERNAME=<span class="s">sshuser</span> \
+    <span class="k">-e</span> MIKROTIK_PASSWORD=<span class="s">your_password</span> \
+    <span class="k">-e</span> MIKROTIK_MCP__TRANSPORT=<span class="s">sse</span> \
+    mikrotik-mcp
+
+<span class="c"># Available at:</span>
+<span class="c">#   SSE             →  http://localhost:8000/sse</span>
+<span class="c">#   Streamable HTTP →  http://localhost:8000/mcp</span>
+<span class="c">#   Health          →  GET  http://localhost:8000/health</span></pre>
+
+    <h3 id="env">Environment variables</h3>
+    <table class="table">
+      <thead>
+        <tr><th>Variable</th><th>Description</th><th>Default</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code class="mono">MIKROTIK_HOST</code></td><td>Device IP / hostname</td><td><code class="mono">192.168.88.1</code></td></tr>
+        <tr><td><code class="mono">MIKROTIK_USERNAME</code></td><td>SSH username</td><td><code class="mono">admin</code></td></tr>
+        <tr><td><code class="mono">MIKROTIK_PASSWORD</code></td><td>SSH password</td><td><em style="color:var(--ink-mute)">(empty)</em></td></tr>
+        <tr><td><code class="mono">MIKROTIK_PORT</code></td><td>SSH port</td><td><code class="mono">22</code></td></tr>
+        <tr><td><code class="mono">MIKROTIK_MCP__TRANSPORT</code></td><td>Transport — <code>stdio</code> · <code>sse</code> · <code>streamable-http</code></td><td><code class="mono">stdio</code></td></tr>
+        <tr><td><code class="mono">MIKROTIK_MCP__HOST</code></td><td>HTTP listen address</td><td><code class="mono">0.0.0.0</code></td></tr>
+        <tr><td><code class="mono">MIKROTIK_MCP__PORT</code></td><td>HTTP listen port</td><td><code class="mono">8000</code></td></tr>
+      </tbody>
+    </table>
+
+    <!-- MANUAL -->
+    <h2 id="manual">Manual install</h2>
+    <p>If you prefer to run from a Python venv — useful for development and debugging.</p>
+
+    <div class="code-header"><span># Source install</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="c"># Clone the repository</span>
+<span class="p">$</span> git clone https://github.com/jeff-nasseri/mikrotik-mcp.git
+<span class="p">$</span> <span class="k">cd</span> mikrotik-mcp
+
+<span class="c"># Create &amp; activate virtual environment</span>
+<span class="p">$</span> python <span class="k">-m</span> venv .venv
+<span class="p">$</span> <span class="k">source</span> .venv/bin/activate    <span class="c"># Windows: .venv\Scripts\activate</span>
+
+<span class="c"># Install in editable mode</span>
+<span class="p">$</span> pip install <span class="k">-e</span> .
+
+<span class="c"># Run the server (stdio, default)</span>
+<span class="p">$</span> mcp-server-mikrotik
+
+<span class="c"># Or with SSE / streamable HTTP transport</span>
+<span class="p">$</span> mcp-server-mikrotik <span class="k">--mcp.transport</span> sse
+<span class="p">$</span> mcp-server-mikrotik <span class="k">--mcp.transport</span> streamable-http</pre>
+
+    <h3 id="cli">CLI options</h3>
+    <table class="table">
+      <thead>
+        <tr><th>Flag</th><th>Description</th><th>Default</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code class="mono">--host</code></td><td>MikroTik device IP / hostname</td><td>from config</td></tr>
+        <tr><td><code class="mono">--username</code></td><td>SSH username</td><td>from config</td></tr>
+        <tr><td><code class="mono">--password</code></td><td>SSH password</td><td>from config</td></tr>
+        <tr><td><code class="mono">--key-filename</code></td><td>SSH key file (preferred over password)</td><td>—</td></tr>
+        <tr><td><code class="mono">--port</code></td><td>SSH port</td><td><code class="mono">22</code></td></tr>
+        <tr><td><code class="mono">--mcp.transport</code></td><td><code>stdio</code> · <code>sse</code> · <code>streamable-http</code></td><td><code class="mono">stdio</code></td></tr>
+        <tr><td><code class="mono">--mcp.host</code></td><td>HTTP listen address</td><td><code class="mono">0.0.0.0</code></td></tr>
+        <tr><td><code class="mono">--mcp.port</code></td><td>HTTP listen port</td><td><code class="mono">8000</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <span class="icon">TIP</span>
+      <div>
+        Prefer SSH keys over passwords for production. Pass <code>--key-filename ~/.ssh/mikrotik_ed25519</code>
+        and create the matching public key under <code>/user ssh-keys</code> on the device.
+      </div>
+    </div>
+
+    <!-- TESTING -->
+    <h2 id="testing">Testing the install</h2>
+    <p>Once the server is up, the quickest sanity check is the MCP Inspector — it speaks MCP, lists every tool,
+      and lets you invoke them by hand.</p>
+
+    <div class="code-header"><span># Inspector against a fresh install</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="p">$</span> npx @modelcontextprotocol/inspector \
+    uvx mcp-server-mikrotik \
+    <span class="k">--host</span> <span class="s">192.168.88.1</span> \
+    <span class="k">--username</span> <span class="s">admin</span> \
+    <span class="k">--password</span> <span class="s">"&lt;PASSWORD&gt;"</span> \
+    <span class="k">--port</span> <span class="n">22</span></pre>
+
+    <p>A browser tab opens with the tool catalog. Try <code>mikrotik_list_vlan_interfaces</code> with an
+      empty argument — if you get back a JSON list, you're in.</p>
+
+    <!-- CONTEXT -->
+    <h2 id="context">Context length optimization</h2>
+    <p>The full tool catalog is ~140 entries. For local LLMs with tight context windows, you can scope the
+      server to specific categories using the <code>--mcp.tools</code> flag (comma-separated list of categories).</p>
+
+    <div class="code-header"><span># Only expose VLAN + firewall + NAT</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="p">$</span> mcp-server-mikrotik <span class="k">--mcp.tools</span> <span class="s">"vlan,firewall,nat"</span></pre>
+
+    <p>This roughly halves the schema you send on each request. Useful for ChatGPT 7B/13B local models.</p>
+
+    <!-- NEXT -->
+    <div class="pager">
+      <a href="../index.html">
+        <span class="label">← back</span>
+        <span class="target">Landing page</span>
+      </a>
+      <a href="configure.html" class="next">
+        <span class="label">next →</span>
+        <span class="target">Integrations · Claude Desktop, Inspector, MCPO</span>
+      </a>
+    </div>
+  </main>
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h6>On this page</h6>
+    <ul>
+      <li><a href="#prereq">Prerequisites</a></li>
+      <li><a href="#docker">Docker</a></li>
+      <li><a href="#stdio-docker">— stdio</a></li>
+      <li><a href="#sse-docker">— SSE / HTTP</a></li>
+      <li><a href="#env">— Env variables</a></li>
+      <li><a href="#manual">Manual install</a></li>
+      <li><a href="#cli">— CLI options</a></li>
+      <li><a href="#testing">Testing the install</a></li>
+      <li><a href="#context">Context optimization</a></li>
+    </ul>
+  </aside>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div>
+      <div class="brand" style="margin-bottom: 12px;">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="2.5" y="9" width="19" height="8.5" rx="1" stroke="var(--amber)"/>
+            <line x1="6" y1="13.25" x2="9" y2="13.25" stroke="var(--lime)"/>
+            <line x1="11" y1="13.25" x2="14" y2="13.25" stroke="var(--lime)"/>
+            <line x1="16" y1="13.25" x2="18" y2="13.25" stroke="var(--lime)"/>
+          </svg>
+        </span>
+        MikroTik MCP
+      </div>
+      <p style="font-size:13px;max-width:280px;">An open-source MCP server bridging large language models with RouterOS devices. Not affiliated with MikroTik.</p>
+      <p style="margin-top: 14px; font-size: 12px; color: var(--ink-mute);">MIT License · © 2026 jeff-nasseri &amp; contributors</p>
+    </div>
+    <div>
+      <h5>Docs</h5>
+      <ul>
+        <li><a href="index.html">Installation</a></li>
+        <li><a href="configure.html">Integrations</a></li>
+        <li><a href="reference.html">API reference</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Source</h5>
+      <ul>
+        <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/LICENSE" target="_blank" rel="noopener">License</a></li>
+        <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Related</h5>
+      <ul>
+        <li><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol</a></li>
+        <li><a href="https://wiki.mikrotik.com" target="_blank" rel="noopener">RouterOS wiki</a></li>
+        <li><a href="https://github.com/modelcontextprotocol/inspector" target="_blank" rel="noopener">MCP Inspector</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const code = btn.closest('.code-header').nextElementSibling.innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => btn.textContent = orig, 1200);
+      });
+    });
+  });
+</script>
+</body>
+</html>
