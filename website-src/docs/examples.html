@@ -172,6 +172,17 @@
     <span class="k">--tool-args</span> <span class="s">'{"name": "vlan100", "comment": "Updated Production VLAN"}'</span>
 <span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">mikrotik_remove_vlan_interface</span> <span class="k">--tool-args</span> <span class="s">'{"name": "vlan100"}'</span></pre>
 
+    <div class="ex-sub">PoE (Power over Ethernet) — read-only monitoring</div>
+    <div class="code-header"><span># monitor · list · per-port settings</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="c"># Real-time PoE-out telemetry (voltage, current, power) for one or more ports</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">get_poe_monitor</span> <span class="k">--tool-args</span> <span class="s">'{"interfaces": "ether1"}'</span>
+
+<span class="c"># List PoE-capable interfaces (PoE-out mode, priority)</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">list_poe</span> <span class="k">--tool-args</span> <span class="s">'{"interface_filter": "ether"}'</span>
+
+<span class="c"># Detailed PoE-out settings for a specific port</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">get_poe_settings</span> <span class="k">--tool-args</span> <span class="s">'{"name": "ether1"}'</span></pre>
+
     <div class="ex-sub">IP addresses</div>
     <div class="code-header"><span># bind / inspect / remove an address</span><button class="copy-btn">Copy</button></div>
     <pre class="code"><span class="c"># Add an address to an interface</span>
