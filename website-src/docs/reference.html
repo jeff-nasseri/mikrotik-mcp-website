@@ -199,10 +199,11 @@
     <ul>
       <li><a href="examples.html">Usage examples</a></li>
       <li><a href="examples.html#workflows">Complete workflows</a></li>
+      <li><a href="articles.html">Articles &amp; tutorials</a></li>
     </ul>
     <h6>Project</h6>
     <ul>
-      <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/docs/contributing.md" target="_blank" rel="noopener">Contributing</a></li>
+      <li><a href="contributing.html">Contributing</a></li>
       <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/LICENSE" target="_blank" rel="noopener">License</a></li>
     </ul>
   </aside>
@@ -466,6 +467,8 @@
           <div class="row"><span class="pname">disabled</span><span class="pkind">optional</span><span class="pdesc">Enable / disable</span></div>
           <div class="row"><span class="pname">mtu</span><span class="pkind">optional</span><span class="pdesc">New MTU</span></div>
           <div class="row"><span class="pname">arp</span><span class="pkind">optional</span><span class="pdesc">ARP mode</span></div>
+          <div class="row"><span class="pname">use_service_tag</span><span class="pkind">optional</span><span class="pdesc">802.1ad service tag</span></div>
+          <div class="row"><span class="pname">arp_timeout</span><span class="pkind">optional</span><span class="pdesc">ARP timeout</span></div>
         </div>
         <div class="ex">
 <span class="lbl">Example</span><span class="fn">mikrotik_update_vlan_interface</span>(<span class="key">name</span>=<span class="str">"vlan100"</span>, <span class="key">comment</span>=<span class="str">"Production VLAN"</span>)
@@ -504,12 +507,14 @@
           <div class="row"><span class="pname">address</span><span class="pkind req">required</span><span class="pdesc">CIDR, e.g. <code>192.168.100.1/24</code></span></div>
           <div class="row"><span class="pname">interface</span><span class="pkind req">required</span><span class="pdesc">Interface name</span></div>
           <div class="row"><span class="pname">comment</span><span class="pkind">optional</span><span class="pdesc">Description</span></div>
+          <div class="row"><span class="pname">network · broadcast</span><span class="pkind">optional</span><span class="pdesc">Manual network / broadcast overrides</span></div>
+          <div class="row"><span class="pname">disabled</span><span class="pkind">optional</span><span class="pdesc">Add in a disabled state</span></div>
         </div>
         <div class="ex"><span class="lbl">Example</span><span class="fn">mikrotik_add_ip_address</span>(<span class="key">address</span>=<span class="str">"192.168.100.1/24"</span>, <span class="key">interface</span>=<span class="str">"vlan100"</span>)</div>
       </div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb read">list · get</span><span class="tname">mikrotik_list_ip_addresses · mikrotik_get_ip_address</span></div>
-      <div class="tool-body"><p>Inspect bindings — <code>list</code> takes optional filters (by interface, address, or dynamic flag); <code>get</code> returns one address record by ID.</p></div>
+      <div class="tool-body"><p>Inspect bindings — <code>list</code> takes optional filters (by interface, address, network, dynamic flag, or disabled-only); <code>get</code> returns one address record by ID.</p></div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb delete">remove</span><span class="tname">mikrotik_remove_ip_address</span></div>
       <div class="tool-body"><div class="params"><div class="row"><span class="pname">address_id</span><span class="pkind req">required</span><span class="pdesc">RouterOS address record ID</span></div></div></div>
@@ -535,10 +540,10 @@
       </div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb read">list · get · used</span><span class="tname">mikrotik_list_ip_pools · mikrotik_get_ip_pool · mikrotik_list_ip_pool_used</span></div>
-      <div class="tool-body"><p>Inspect pool definitions, fetch a single pool by name, plus the live used-address table (which addresses are currently leased from a pool).</p></div>
+      <div class="tool-body"><p>Inspect pool definitions, fetch a single pool by name, plus the live used-address table (which addresses are currently leased from a pool). <code>list_ip_pools</code> accepts <code>name_filter</code> / <code>ranges_filter</code> / <code>include_used</code>; <code>list_ip_pool_used</code> filters by <code>pool_name</code>, <code>address_filter</code>, <code>mac_filter</code>, and <code>info_filter</code>.</p></div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb update">update · expand</span><span class="tname">mikrotik_update_ip_pool · mikrotik_expand_ip_pool</span></div>
-      <div class="tool-body"><p><code>update</code> edits a pool's name, ranges, or next-pool chain; <code>expand</code> appends additional ranges without disrupting existing leases.</p>
+      <div class="tool-body"><p><code>update</code> edits a pool's <code>name</code> (rename via <code>new_name</code>), ranges, or next-pool chain; <code>expand</code> appends additional ranges without disrupting existing leases.</p>
         <div class="ex"><span class="lbl">Example</span><span class="fn">mikrotik_expand_ip_pool</span>(<span class="key">name</span>=<span class="str">"dhcp-pool"</span>, <span class="key">additional_ranges</span>=<span class="str">"192.168.1.201-192.168.1.250"</span>)</div>
       </div>
     </div>
@@ -589,8 +594,13 @@
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">create</span><span class="tname">mikrotik_set_dns_servers · mikrotik_add_dns_static · mikrotik_add_dns_regexp</span></div>
       <div class="tool-body"><p>Configure upstream resolvers, add static records, and define regex-based blocklists.
-        <code>set_dns_servers</code> also accepts <code>allow_remote_requests</code>, cache sizing, and
-        DoH options (<code>use_doh</code>, <code>doh_server</code>, <code>verify_doh_cert</code>).</p>
+        <code>set_dns_servers</code> also accepts <code>allow_remote_requests</code>, cache tuning
+        (<code>cache_size</code>, <code>cache_max_ttl</code>, <code>max_udp_packet_size</code>,
+        <code>max_concurrent_queries</code>), and DoH options (<code>use_doh</code>, <code>doh_server</code>,
+        <code>verify_doh_cert</code>). <code>add_dns_static</code> takes the record-type fields
+        <code>cname</code>, <code>mx_preference</code>/<code>mx_exchange</code>, <code>text</code>,
+        <code>srv_priority</code>/<code>weight</code>/<code>port</code>/<code>target</code>, plus
+        <code>ttl</code> and <code>regexp</code>.</p>
         <div class="ex"><span class="lbl">Example</span><span class="fn">mikrotik_set_dns_servers</span>(<span class="key">servers</span>=[<span class="str">"8.8.8.8"</span>, <span class="str">"1.1.1.1"</span>], <span class="key">allow_remote_requests</span>=<span class="num">true</span>)
 <span class="fn">mikrotik_add_dns_static</span>(<span class="key">name</span>=<span class="str">"router.local"</span>, <span class="key">address</span>=<span class="str">"192.168.1.1"</span>)</div>
       </div>
@@ -664,7 +674,8 @@
           <div class="row"><span class="pname">protocol</span><span class="pkind">optional</span><span class="pdesc">tcp, udp, icmp, …</span></div>
           <div class="row"><span class="pname">in_interface · out_interface</span><span class="pkind">optional</span><span class="pdesc">Match by interface</span></div>
           <div class="row"><span class="pname">connection_state</span><span class="pkind">optional</span><span class="pdesc">e.g. <code>"established,related"</code></span></div>
-          <div class="row"><span class="pname">src_address_list</span><span class="pkind">optional</span><span class="pdesc">Named address list</span></div>
+          <div class="row"><span class="pname">src_address_list · dst_address_list</span><span class="pkind">optional</span><span class="pdesc">Named source / destination address lists</span></div>
+          <div class="row"><span class="pname">connection_nat_state</span><span class="pkind">optional</span><span class="pdesc">Connection NAT state match</span></div>
           <div class="row"><span class="pname">tcp_flags · limit</span><span class="pkind">optional</span><span class="pdesc">TCP flag matches; rate limit</span></div>
           <div class="row"><span class="pname">comment · disabled</span><span class="pkind">optional</span><span class="pdesc">Description; create disabled</span></div>
           <div class="row"><span class="pname">log · log_prefix</span><span class="pkind">optional</span><span class="pdesc">Enable logging; log prefix string</span></div>
@@ -757,7 +768,7 @@
         <h2 id="wireguard">WireGuard — Tunnels &amp; Peers</h2>
         <p class="section-intro">Create WireGuard interfaces, add peers with allowed-IPs and endpoints,
           and generate ready-to-paste client configs. The interface's public key is returned by
-          <code>get_wireguard_interface</code> — hand it to clients.</p>
+          <code>get_wireguard_interface</code> — hand it to clients. WireGuard requires RouterOS v7+.</p>
       </div>
       <div class="meta"><b>15</b> tools<br>category 11</div>
     </div>
@@ -778,7 +789,7 @@
       <div class="tool-body"><p>List all WireGuard interfaces or fetch one — the latter includes the device's public key for clients to use.</p></div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb update">interface update · toggle · remove</span><span class="tname">mikrotik_update_wireguard_interface · mikrotik_enable_wireguard_interface · mikrotik_disable_wireguard_interface · mikrotik_remove_wireguard_interface</span></div>
-      <div class="tool-body"><p>Edit, toggle, or remove an interface.</p></div>
+      <div class="tool-body"><p>Edit, toggle, or remove an interface. Removing an interface also deletes all of its peers.</p></div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">peer add</span><span class="tname">mikrotik_add_wireguard_peer</span></div>
       <div class="tool-body"><p>Attaches a peer to an interface.</p>
@@ -799,13 +810,40 @@
       <div class="tool-body"><p>Edit, toggle, or remove peers. Identifiers are RouterOS peer IDs.</p></div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">generate</span><span class="tname">mikrotik_generate_wireguard_client_config</span></div>
-      <div class="tool-body"><p>Produces a complete client <code>.conf</code> (the <code>[Interface]</code> / <code>[Peer]</code> blocks) ready to paste into a WireGuard client.</p>
+      <div class="tool-body"><p>Produces a complete client <code>.conf</code> (the <code>[Interface]</code> / <code>[Peer]</code> blocks) ready to paste into a WireGuard client. This tool only formats text locally — it does <strong>not</strong> contact the router, so first use <code>get_wireguard_interface</code> for the server's public key and <code>add_wireguard_peer</code> to register the client.</p>
         <div class="params">
           <div class="row"><span class="pname">client_private_key</span><span class="pkind req">required</span><span class="pdesc">Client's private key</span></div>
           <div class="row"><span class="pname">client_address</span><span class="pkind req">required</span><span class="pdesc">Client tunnel address</span></div>
           <div class="row"><span class="pname">server_public_key</span><span class="pkind req">required</span><span class="pdesc">Server's public key</span></div>
           <div class="row"><span class="pname">server_endpoint</span><span class="pkind req">required</span><span class="pdesc">Server host / IP</span></div>
-          <div class="row"><span class="pname">server_port · allowed_ips · dns · persistent_keepalive</span><span class="pkind">optional</span><span class="pdesc">Defaults: <code>51820</code>, <code>0.0.0.0/0</code>, keepalive <code>25</code></span></div>
+          <div class="row"><span class="pname">server_port · allowed_ips · dns · persistent_keepalive</span><span class="pkind">optional</span><span class="pdesc">Defaults: <code>51820</code>, <code>0.0.0.0/0</code>, keepalive <code>25</code>. Use <code>allowed_ips="0.0.0.0/0, ::/0"</code> for a full tunnel, or a specific subnet for split-tunnel.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-head">
+        <span class="verb create">walkthrough</span>
+        <span class="tname">Setting up a WireGuard server</span>
+      </div>
+      <div class="tool-body">
+        <p>The single-purpose tools above compose into a full VPN server. Run them in order — steps 2–4 reach
+          into other categories (IP address, firewall, NAT):</p>
+        <div class="ex">
+<span class="lbl">Ordered sequence</span><span class="c"># 1. Create the interface</span>
+<span class="fn">mikrotik_create_wireguard_interface</span>(<span class="key">name</span>=<span class="str">"wg0"</span>, <span class="key">listen_port</span>=<span class="num">51820</span>)
+<span class="c"># 2. Give it a tunnel address</span>
+<span class="fn">mikrotik_add_ip_address</span>(<span class="key">address</span>=<span class="str">"10.0.0.1/24"</span>, <span class="key">interface</span>=<span class="str">"wg0"</span>)
+<span class="c"># 3. Allow inbound WireGuard UDP</span>
+<span class="fn">mikrotik_create_filter_rule</span>(<span class="key">chain</span>=<span class="str">"input"</span>, <span class="key">action</span>=<span class="str">"accept"</span>, <span class="key">protocol</span>=<span class="str">"udp"</span>, <span class="key">dst_port</span>=<span class="str">"51820"</span>)
+<span class="c"># 4. (optional) Masquerade clients out to the internet</span>
+<span class="fn">mikrotik_create_nat_rule</span>(<span class="key">chain</span>=<span class="str">"srcnat"</span>, <span class="key">action</span>=<span class="str">"masquerade"</span>, <span class="key">out_interface</span>=<span class="str">"ether1"</span>)
+<span class="c"># 5. Read the server public key for clients</span>
+<span class="fn">mikrotik_get_wireguard_interface</span>(<span class="key">name</span>=<span class="str">"wg0"</span>)
+<span class="c"># 6. Register each client as a peer</span>
+<span class="fn">mikrotik_add_wireguard_peer</span>(<span class="key">interface</span>=<span class="str">"wg0"</span>, <span class="key">public_key</span>=<span class="str">"&lt;client-pubkey&gt;"</span>, <span class="key">allowed_address</span>=<span class="str">"10.0.0.2/32"</span>)
+<span class="c"># 7. Generate the client .conf</span>
+<span class="fn">mikrotik_generate_wireguard_client_config</span>(<span class="key">client_private_key</span>=<span class="str">"&lt;client-privkey&gt;"</span>, <span class="key">client_address</span>=<span class="str">"10.0.0.2/24"</span>, <span class="key">server_public_key</span>=<span class="str">"&lt;server-pubkey&gt;"</span>, <span class="key">server_endpoint</span>=<span class="str">"203.0.113.1"</span>)
         </div>
       </div>
     </div>
@@ -872,8 +910,12 @@
       </div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">queue type</span><span class="tname">create_queue_type · list_queue_types · get_queue_type · update_queue_type · remove_queue_type</span></div>
-      <div class="tool-body"><p>Define reusable queue disciplines. <code>kind</code> is one of <code>cake</code>, <code>fq-codel</code>,
-        <code>sfq</code>, <code>red</code>, <code>pcq</code>, <code>pfifo</code>, <code>bfifo</code>, …</p>
+      <div class="tool-body"><p>Define reusable queue disciplines. <code>kind</code> (default <code>cake</code>) is one of <code>cake</code>,
+        <code>fq-codel</code>, <code>sfq</code>, <code>red</code>, <code>pcq</code>, <code>pfifo</code>,
+        <code>bfifo</code>, … each with its own tuning parameters (e.g. <code>cake_flowmode</code>/<code>cake_nat</code>/<code>cake_overhead</code>
+        for CAKE, <code>pcq_rate</code>/<code>pcq_classifier</code> for PCQ, <code>sfq_perturb</code> for SFQ,
+        <code>red_*</code> thresholds for RED). Built-in types (<code>default</code>, <code>default-small</code>, …)
+        can't be modified or removed.</p>
       </div>
     </div>
     <!-- ============ 14 USERS ============ -->
@@ -928,7 +970,7 @@
       <div class="tool-body"><p>List backup files, inspect a backup's metadata, and download files off the device.</p></div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb update">restore · import · upload</span><span class="tname">mikrotik_restore_backup · mikrotik_import_configuration · mikrotik_upload_file</span></div>
-      <div class="tool-body"><p>Restore a binary backup, import a <code>.rsc</code> config, or upload an arbitrary file (base64) to the device.</p></div>
+      <div class="tool-body"><p>Restore a binary backup (pass <code>password</code> for an encrypted backup), import a <code>.rsc</code> config, or upload an arbitrary file (base64) to the device.</p></div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb delete">remove</span><span class="tname">mikrotik_remove_file</span></div>
       <div class="tool-body"><p>Removes any file from the device's filesystem.</p></div>
@@ -969,17 +1011,35 @@
       </div>
       <div class="meta"><b>4</b> tools<br>category 17</div>
     </div>
+    <div class="callout">
+      <span class="icon">HOW IT WORKS</span>
+      <div>
+        <code>enable_safe_mode</code> opens a <strong>persistent SSH shell</strong> and sends a
+        <code>Ctrl+X</code> to the router. While active, <strong>every</strong> subsequent MCP tool call is
+        routed through that same session automatically (the connector detects it — no per-command
+        connections). <code>commit_safe_mode</code> sends a <strong>second</strong> <code>Ctrl+X</code>,
+        writing the pending changes to flash/NVRAM and closing the session; <code>rollback_safe_mode</code>
+        simply <strong>drops the session</strong> (no Ctrl+X), so RouterOS reverts everything. Pending
+        changes live in memory only — a <strong>router reboot</strong>, not just a dropped connection, also
+        reverts them. Concurrent calls are serialised through an internal lock, so parallel requests are safe.
+      </div>
+    </div>
+
     <div class="tool"><div class="tool-head"><span class="verb create">enable</span><span class="tname">enable_safe_mode</span></div>
-      <div class="tool-body"><p>Starts a safe-mode session. Subsequent changes are journaled and will roll back automatically
-        if the connection drops before commit.</p>
+      <div class="tool-body"><p>Starts a safe-mode session; afterwards every tool call runs inside the one persistent
+        shell until you commit or roll back. Returns an <code>Error: …</code> string if the SSH connection
+        fails or the router doesn't confirm the <code>&lt;SAFE&gt;</code> prompt.</p>
         <div class="params"><div class="row"><span class="pname">—</span><span class="pkind">no params</span><span class="pdesc">Takes no arguments</span></div></div>
       </div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb update">commit · rollback</span><span class="tname">commit_safe_mode · rollback_safe_mode</span></div>
-      <div class="tool-body"><p>Persist the journaled changes, or revert them immediately.</p></div>
+      <div class="tool-body"><p>Persist the journaled changes, or revert them immediately. Both are no-ops when safe mode
+        isn't active — they return <code>"Safe mode is not active. Nothing to commit / roll back."</code></p></div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb read">status</span><span class="tname">safe_mode_status</span></div>
-      <div class="tool-body"><p>Reports whether a safe-mode session is currently active.</p>
+      <div class="tool-body"><p>Reports whether a safe-mode session is currently active — e.g.
+        <code>"Safe mode is ACTIVE. Changes are pending — NOT yet persisted…"</code> versus
+        <code>"Safe mode is NOT active…"</code>.</p>
         <div class="ex"><span class="lbl">Pattern — risky firewall edit under safe mode</span><span class="fn">enable_safe_mode</span>()
 <span class="fn">mikrotik_create_filter_rule</span>(<span class="key">chain</span>=<span class="str">"input"</span>, <span class="key">action</span>=<span class="str">"drop"</span>, <span class="key">src_address</span>=<span class="str">"0.0.0.0/0"</span>)
 <span class="c"># test reachability from another window; if you're locked out, just</span>
@@ -1059,6 +1119,7 @@
         <li><a href="configure.html">Integrations</a></li>
         <li><a href="reference.html">API reference</a></li>
         <li><a href="examples.html">Examples</a></li>
+        <li><a href="articles.html">Articles</a></li>
       </ul>
     </div>
     <div>
@@ -1066,7 +1127,7 @@
       <ul>
         <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp" target="_blank" rel="noopener">GitHub</a></li>
         <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/LICENSE" target="_blank" rel="noopener">License</a></li>
-        <li><a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/docs/contributing.md" target="_blank" rel="noopener">Contributing</a></li>
+        <li><a href="contributing.html">Contributing</a></li>
       </ul>
     </div>
     <div>
