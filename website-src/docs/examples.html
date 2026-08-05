@@ -200,6 +200,24 @@
 <span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">mikrotik_list_ip_addresses</span> <span class="k">--tool-args</span> <span class="s">'{"interface_filter": "vlan100"}'</span>
 <span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">mikrotik_remove_ip_address</span> <span class="k">--tool-args</span> <span class="s">'{"address_id": "*1"}'</span></pre>
 
+    <div class="ex-sub">IPv6 addresses</div>
+    <div class="code-header"><span># add · list · get · remove (no mikrotik_ prefix)</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="c"># Add an IPv6 address, advertising the prefix in Router Advertisements</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">add_ipv6_address</span> \
+    <span class="k">--tool-args</span> <span class="s">'{"address": "2001:db8:1::1/64", "interface": "bridge", "advertise": true}'</span>
+
+<span class="c"># Take the prefix from a delegated IPv6 pool (host part only)</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">add_ipv6_address</span> \
+    <span class="k">--tool-args</span> <span class="s">'{"address": "::1/64", "interface": "bridge", "from_pool": "isp-pd"}'</span>
+
+<span class="c"># List only routable (global) addresses, then only link-local</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">list_ipv6_addresses</span> <span class="k">--tool-args</span> <span class="s">'{"global_only": true}'</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">list_ipv6_addresses</span> <span class="k">--tool-args</span> <span class="s">'{"link_local_only": true}'</span>
+
+<span class="c"># Get / remove by id (*1) or by the address value itself</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">get_ipv6_address</span> <span class="k">--tool-args</span> <span class="s">'{"address_id": "2001:db8:1::1/64"}'</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">remove_ipv6_address</span> <span class="k">--tool-args</span> <span class="s">'{"address_id": "*1"}'</span></pre>
+
     <div class="ex-sub">DHCP server (pool → network → server)</div>
     <div class="code-header"><span># build a DHCP service in three steps</span><button class="copy-btn">Copy</button></div>
     <pre class="code"><span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">mikrotik_create_dhcp_pool</span> \

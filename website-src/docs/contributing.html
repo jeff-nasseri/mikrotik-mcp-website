@@ -114,7 +114,7 @@
     <div class="code-header"><span>repository layout</span><button class="copy-btn">Copy</button></div>
     <pre class="code">src/mcp_mikrotik/
 ├── scope/          <span class="c"># Feature modules — each file registers MCP tools via decorators</span>
-├── app.py          <span class="c"># FastMCP instance and ToolAnnotation constants</span>
+├── app.py          <span class="c"># MCPServer instance and ToolAnnotation constants</span>
 ├── config.py       <span class="c"># Configuration (pydantic-settings, CLI args, env vars)</span>
 ├── connector.py    <span class="c"># SSH connection handling</span>
 ├── server.py       <span class="c"># Entry point — imports scopes, starts the server</span>
@@ -154,7 +154,7 @@ tests/
 
     <div class="code-header"><span># Example structure — scope/my_feature.py</span><button class="copy-btn">Copy</button></div>
     <pre class="code"><span class="k">from</span> typing <span class="k">import</span> Optional
-<span class="k">from</span> mcp.server.fastmcp <span class="k">import</span> Context
+<span class="k">from</span> mcp.server.mcpserver <span class="k">import</span> Context
 <span class="k">from</span> ..connector <span class="k">import</span> execute_mikrotik_command
 <span class="k">from</span> ..app <span class="k">import</span> mcp, READ, WRITE, annotate
 
