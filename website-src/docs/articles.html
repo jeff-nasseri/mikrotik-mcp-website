@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <meta name="theme-color" content="#0a0d12" />
 <title>Articles &amp; Tutorials — MikroTik MCP docs</title>
-<meta name="description" content="Real-world MikroTik MCP tutorials and 20 practical RouterOS scenarios — guest/IoT/management VLANs, port forwarding, firewall, DNS/DoH, routing, QoS, wireless, Layer 7, dual-WAN PCC, SNMP, scheduler backups, and user management — plus a Query Commands reference for verifying every configuration." />
+<meta name="description" content="Real-world MikroTik MCP tutorials and 25 practical RouterOS scenarios — guest/IoT/management VLANs, port forwarding, firewall, DNS/DoH, routing, QoS, wireless, Layer 7, dual-WAN PCC, SNMP, scheduler backups, user management, and multi-device fleet workflows with the inventory — plus a Query Commands reference for verifying every configuration." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -145,14 +145,16 @@
     <p class="doc-lede">
       MikroTik MCP lets you manage and configure RouterOS devices with natural language — describe
       what you want, and the AI assistant runs the right tools for you. This is the learning hub:
-      a real-world write-up on AI-powered network management, plus 20 practical scenarios that pair
-      a plain-English prompt with the exact RouterOS commands it produces.
+      real-world write-ups on AI-powered network management, plus 25 practical scenarios — including
+      five multi-device fleet workflows — that pair a plain-English prompt with the exact RouterOS
+      commands it produces.
     </p>
 
     <!-- ============ LEARNING RESOURCES ============ -->
     <h2 id="learning" style="margin-top:0">Learning resources</h2>
-    <p>An introductory read on how AI reshapes traditional network-management workflows, with
-      hands-on MikroTik MCP examples.</p>
+    <p>Two real-world write-ups: an introductory read on how AI reshapes traditional
+      network-management workflows, and a hands-on guide to running a whole MikroTik fleet from one
+      MCP server.</p>
 
     <div class="article-card">
       <p class="kicker">Medium · Article</p>
@@ -163,8 +165,20 @@
       <a class="btn" href="https://medium.com/@sir.jeff.nasseri/bringing-ai-powered-network-management-to-network-engineers-06167aab409f" target="_blank" rel="noopener">Read on Medium ↗</a>
     </div>
 
+    <div class="article-card">
+      <p class="kicker">Medium · Article</p>
+      <h3>Managing a Whole MikroTik Fleet from One MCP Server</h3>
+      <p class="by">Author: <a href="https://medium.com/@sir.jeff.nasseri" target="_blank" rel="noopener">@jeff-nasseri</a></p>
+      <p class="desc">How to manage multiple MikroTik devices from a single MCP server using the
+        <a href="reference.html#inventory">inventory</a>: configuring the YAML file, wiring it up
+        (including Docker), and prompt patterns for fleet work — discovery, tag-targeted rollouts,
+        cross-device comparison, and safe-mode-guarded changes.</p>
+      <a class="btn" href="https://medium.com/@sir.jeff.nasseri/managing-a-whole-mikrotik-fleet-from-one-mcp-server-60245de07073" target="_blank" rel="noopener">Read on Medium ↗</a>
+      <a class="btn" style="margin-left:8px" href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/docs/articles/managing-a-mikrotik-fleet.md" target="_blank" rel="noopener">Read in the repo ↗</a>
+    </div>
+
     <!-- ============ 20 PRACTICAL EXAMPLES ============ -->
-    <h2 id="examples">20 practical examples</h2>
+    <h2 id="examples">25 practical examples</h2>
     <p>Common network scenarios for developers learning to drive MikroTik devices through the MCP
       tools. Each card shows the prompt you'd give the AI and the equivalent RouterOS CLI commands
       it runs under the hood.</p>
@@ -666,7 +680,19 @@
     <div class="ex-card" id="ex20">
       <span class="ex-num">Example 20</span>
       <h3>Complete Backup and Restore Strategy</h3>
-      <p class="scenario"><strong>Scenario:</strong> Automated daily backups with cloud upload.</p>
+      <span class="label">Prompt to AI</span>
+      <p class="ask">Set up an automated backup system for my router. Create manual backup named
+        "daily-backup", export configuration to "daily-config" file. Schedule automatic backups to
+        run daily at 2:00 AM with date in filename. Schedule weekly cleanup at 3:00 AM on Sundays to
+        delete backups older than 7 days. If USB drive is mounted as usb1, copy backups to USB drive
+        in a backups folder.</p>
+      <p class="willdo-label">What AI will do</p>
+      <ol>
+        <li>Create the "daily-backup" backup and the "daily-config" export</li>
+        <li>Create a "daily-backup" scheduler at 02:00:00 (1-day interval) writing date-stamped backups</li>
+        <li>Create a "cleanup-old-backups" scheduler at 03:00:00 (7-day interval) removing files older than 7 days (604800s)</li>
+        <li>Copy backup files to usb1/backups/ when the USB drive is mounted, with error handling for its availability</li>
+      </ol>
       <div class="code-header"><span># Manual RouterOS commands</span><button class="copy-btn">Copy</button></div>
       <pre class="code"># Create backup
 /system backup save name=daily-backup
@@ -682,6 +708,152 @@
 
 # Export to USB (if USB drive mounted)
 /file copy [find name~"backup"] destination-path=usb1/backups/</pre>
+    </div>
+
+    <!-- ============ MULTI-DEVICE EXAMPLES (INVENTORY) ============ -->
+    <h2 id="multi">Multi-device examples (inventory)</h2>
+    <p>The examples above target a single router. With an
+      <a href="reference.html#inventory">inventory</a> configured, one MCP server manages a whole
+      fleet: every tool accepts a <code>device</code> argument naming the inventory
+      <code>title</code> to target, and a <code>list_devices</code> tool lets the AI discover the
+      fleet on its own. The prompt-engineering pattern is simple — <strong>name your devices the way
+      you talk about them</strong> (<code>office-core</code>, <code>branch-berlin</code>), then refer
+      to them by name, by tag, or just say "all devices". If the AI ever omits or mistypes a device,
+      the server answers with the list of valid titles, so it corrects itself on the next call.</p>
+    <p>These examples assume this inventory:</p>
+    <div class="code-header"><span>inventory.yaml</span><button class="copy-btn">Copy</button></div>
+    <pre class="code">- title: office-core
+  host: 192.168.88.1
+  username: admin
+  tags: [office, core]
+  region: NL
+
+- title: branch-berlin
+  host: 10.20.0.1
+  username: admin
+  tags: [branch]
+  region: DE</pre>
+
+    <!-- Example 21 -->
+    <div class="ex-card" id="ex21">
+      <span class="ex-num">Example 21</span>
+      <h3>Discover and Audit the Fleet</h3>
+      <span class="label">Prompt to AI</span>
+      <p class="ask">Which MikroTik devices do you manage? For each one, show me its identity,
+        RouterOS version, and which interfaces are actually running.</p>
+      <p class="willdo-label">What AI will do</p>
+      <ol>
+        <li>Call <code>list_devices</code> to discover the fleet (titles, hosts, tags, regions)</li>
+        <li>Call <code>list_interfaces(device="office-core")</code> and filter for running interfaces</li>
+        <li>Call <code>list_interfaces(device="branch-berlin")</code> and do the same</li>
+        <li>Export the system identity from each device</li>
+        <li>Summarize the fleet in one table: title, host, identity, version, running interfaces</li>
+      </ol>
+      <div class="code-header"><span># Manual RouterOS commands</span><button class="copy-btn">Copy</button></div>
+      <pre class="code"># on office-core
+/system identity print
+/system resource print
+/interface print where running
+
+# on branch-berlin
+/system identity print
+/system resource print
+/interface print where running</pre>
+    </div>
+
+    <!-- Example 22 -->
+    <div class="ex-card" id="ex22">
+      <span class="ex-num">Example 22</span>
+      <h3>Roll Out a VLAN Across Tagged Devices</h3>
+      <span class="label">Prompt to AI</span>
+      <p class="ask">On every device tagged "office", create VLAN 40 on ether2 named vlan40-voip with
+        IP 10.40.0.1/24. Verify each device afterwards and tell me if any of them failed.</p>
+      <p class="willdo-label">What AI will do</p>
+      <ol>
+        <li>Call <code>list_devices</code> and select the devices whose tags include "office"</li>
+        <li>For each matching device (here only office-core): <code>create_vlan_interface(device="office-core", name="vlan40-voip", vlan_id=40, interface="ether2")</code> then <code>add_ip_address(device="office-core", address="10.40.0.1/24", interface="vlan40-voip")</code></li>
+        <li>Verify with <code>list_vlan_interfaces(device="office-core")</code> and <code>list_ip_addresses(device="office-core")</code></li>
+        <li>Report per-device success or failure instead of assuming the writes landed</li>
+      </ol>
+      <div class="code-header"><span># Manual RouterOS commands</span><button class="copy-btn">Copy</button></div>
+      <pre class="code"># on each device tagged "office"
+/interface vlan add name=vlan40-voip vlan-id=40 interface=ether2
+/ip address add address=10.40.0.1/24 interface=vlan40-voip
+/interface vlan print
+/ip address print where interface=vlan40-voip</pre>
+    </div>
+
+    <!-- Example 23 -->
+    <div class="ex-card" id="ex23">
+      <span class="ex-num">Example 23</span>
+      <h3>Compare Configuration Between Two Devices</h3>
+      <span class="label">Prompt to AI</span>
+      <p class="ask">Compare the firewall filter rules on office-core and branch-berlin. Summarize
+        what exists on one but not the other, and flag anything on branch-berlin that allows traffic
+        office-core would drop.</p>
+      <p class="willdo-label">What AI will do</p>
+      <ol>
+        <li>Call <code>list_filter_rules(device="office-core")</code> and <code>list_filter_rules(device="branch-berlin")</code></li>
+        <li>Diff the two rule sets by chain, action, and match criteria</li>
+        <li>Highlight rules present on only one device</li>
+        <li>Call out permissive rules on branch-berlin that contradict office-core policy</li>
+        <li>Present the result as a summary, not a raw dump</li>
+      </ol>
+      <div class="code-header"><span># Manual RouterOS commands</span><button class="copy-btn">Copy</button></div>
+      <pre class="code"># on office-core
+/ip firewall filter print detail
+
+# on branch-berlin
+/ip firewall filter print detail
+
+# then compare the two outputs by hand</pre>
+    </div>
+
+    <!-- Example 24 -->
+    <div class="ex-card" id="ex24">
+      <span class="ex-num">Example 24</span>
+      <h3>Risky Change on One Device, Guarded by Safe Mode</h3>
+      <span class="label">Prompt to AI</span>
+      <p class="ask">I need to tighten the firewall on branch-berlin, but I'm remote and can't afford
+        to lock myself out. Enable safe mode on it first, add a forward-chain drop rule for
+        203.0.113.0/24, show me the resulting rules, and only commit if the rule looks correct.
+        office-core must not be touched.</p>
+      <p class="willdo-label">What AI will do</p>
+      <ol>
+        <li>Call <code>enable_safe_mode(device="branch-berlin")</code> — safe mode is tracked per device, so office-core is unaffected</li>
+        <li>Create the rule with <code>create_filter_rule(device="branch-berlin", chain="forward", action="drop", dst_address="203.0.113.0/24")</code></li>
+        <li>Verify with <code>list_filter_rules(device="branch-berlin")</code></li>
+        <li>If correct: <code>commit_safe_mode(device="branch-berlin")</code> to persist; if wrong: <code>rollback_safe_mode(device="branch-berlin")</code> and the router reverts automatically</li>
+        <li>Confirm <code>safe_mode_status(device="office-core")</code> still reports inactive</li>
+      </ol>
+      <div class="code-header"><span># Manual RouterOS commands</span><button class="copy-btn">Copy</button></div>
+      <pre class="code"># on branch-berlin (interactive session)
+# Ctrl+X                                  &lt;- enter safe mode
+/ip firewall filter add chain=forward action=drop dst-address=203.0.113.0/24
+/ip firewall filter print
+# Ctrl+X                                  &lt;- commit and leave safe mode
+# (or drop the session to auto-revert)</pre>
+    </div>
+
+    <!-- Example 25 -->
+    <div class="ex-card" id="ex25">
+      <span class="ex-num">Example 25</span>
+      <h3>Fleet-Wide DNS Record with Per-Device Verification</h3>
+      <span class="label">Prompt to AI</span>
+      <p class="ask">Add a static DNS record printer.lan pointing to 192.168.88.50 on all devices.
+        Then query each device to prove the record resolves everywhere.</p>
+      <p class="willdo-label">What AI will do</p>
+      <ol>
+        <li>Call <code>list_devices</code> to enumerate the fleet</li>
+        <li>For each device: <code>add_dns_static(device=…, name="printer.lan", address="192.168.88.50")</code></li>
+        <li>Confirm with <code>list_dns_static(device=…)</code>, then prove resolution with <code>test_dns_query(device=…, hostname="printer.lan")</code></li>
+        <li>Report a per-device table: created, verified, resolved</li>
+      </ol>
+      <div class="code-header"><span># Manual RouterOS commands</span><button class="copy-btn">Copy</button></div>
+      <pre class="code"># on every device
+/ip dns static add name=printer.lan address=192.168.88.50
+/ip dns static print
+/resolve printer.lan</pre>
     </div>
 
     <!-- ============ QUERY COMMANDS REFERENCE ============ -->
@@ -741,7 +913,7 @@
     <h6>On this page</h6>
     <ul>
       <li><a href="#learning">Learning resources</a></li>
-      <li><a href="#examples">20 practical examples</a></li>
+      <li><a href="#examples">25 practical examples</a></li>
       <li><a href="#ex1">1 · Guest VLAN</a></li>
       <li><a href="#ex2">2 · IoT VLAN 50</a></li>
       <li><a href="#ex3">3 · Port forwarding</a></li>
@@ -762,6 +934,12 @@
       <li><a href="#ex18">18 · User management</a></li>
       <li><a href="#ex19">19 · SNMP monitoring</a></li>
       <li><a href="#ex20">20 · Backup strategy</a></li>
+      <li><a href="#multi">Multi-device (inventory)</a></li>
+      <li><a href="#ex21">21 · Fleet audit</a></li>
+      <li><a href="#ex22">22 · Tagged rollout</a></li>
+      <li><a href="#ex23">23 · Config diff</a></li>
+      <li><a href="#ex24">24 · Safe-mode change</a></li>
+      <li><a href="#ex25">25 · Fleet DNS</a></li>
       <li><a href="#query">Query commands</a></li>
     </ul>
   </aside>

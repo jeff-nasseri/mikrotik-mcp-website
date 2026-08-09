@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <meta name="theme-color" content="#0a0d12" />
 <title>API Reference — MikroTik MCP docs</title>
-<meta name="description" content="Complete API reference for the MikroTik MCP server — 170+ tools across 18 categories: interfaces, PoE, VLAN, IPv4 and IPv6 addressing, DHCP, DNS, routes, firewall, NAT, WireGuard, wireless, queues, users, backup, logs, and safe mode." />
+<meta name="description" content="Complete API reference for the MikroTik MCP server — 170+ tools across 19 categories: a multi-device inventory, interfaces, PoE, VLAN, IPv4 and IPv6 addressing, DHCP, DNS, routes, firewall, NAT, WireGuard, wireless, queues, users, backup, logs, and safe mode." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -217,40 +217,161 @@
     </div>
     <h1 class="doc-title">API reference</h1>
     <p class="doc-lede">
-      Every tool the server exposes, grouped into <strong>18 categories</strong> (170+ tools total). Each
+      Every tool the server exposes, grouped into <strong>19 categories</strong> (170+ tools total). Each
       entry shows the name, what it does, its parameters (required vs optional), and a canonical example.
     </p>
     <p class="doc-lede" style="font-size:15px;">
       <strong>Naming convention.</strong> Most tools are prefixed with <code>mikrotik_</code> followed by a
       verb — <code>create</code>, <code>list</code>, <code>get</code>, <code>update</code>,
-      <code>remove</code>, plus category-specific verbs. Five categories are exceptions:
-      <strong>Interfaces</strong>, <strong>PoE</strong>, <strong>IPv6&nbsp;Address</strong>, <strong>Queues</strong>, and <strong>Safe Mode</strong> tools are called
+      <code>remove</code>, plus category-specific verbs. Six categories are exceptions:
+      <strong>Inventory</strong>, <strong>Interfaces</strong>, <strong>PoE</strong>, <strong>IPv6&nbsp;Address</strong>, <strong>Queues</strong>, and <strong>Safe Mode</strong> tools are called
       <em>without</em> the prefix (e.g. <code>list_interfaces</code>, <code>create_simple_queue</code>,
-      <code>enable_safe_mode</code>). The category headers below flag which convention applies.
+      <code>enable_safe_mode</code>). The category headers below flag which convention applies. With a multi-device
+      <a href="#inventory">inventory</a> configured, every device-scoped tool also accepts an optional
+      <code>device</code> argument naming the inventory title to target.
     </p>
 
     <h2 style="margin-top:0">Categories</h2>
     <div class="cat-index">
-      <a href="#interfaces"><span class="ci-num">01</span><span class="ci-name">Interfaces</span><span class="ci-count">4 tools</span></a>
-      <a href="#poe"><span class="ci-num">02</span><span class="ci-name">PoE</span><span class="ci-count">3 tools</span></a>
-      <a href="#vlan"><span class="ci-num">03</span><span class="ci-name">VLAN</span><span class="ci-count">5 tools</span></a>
-      <a href="#ip-address"><span class="ci-num">04</span><span class="ci-name">IP Address</span><span class="ci-count">4 tools</span></a>
-      <a href="#ipv6-address"><span class="ci-num">05</span><span class="ci-name">IPv6 Address</span><span class="ci-count">4 tools</span></a>
-      <a href="#ip-pool"><span class="ci-num">06</span><span class="ci-name">IP Pool</span><span class="ci-count">7 tools</span></a>
-      <a href="#dhcp"><span class="ci-num">07</span><span class="ci-name">DHCP</span><span class="ci-count">6 tools</span></a>
-      <a href="#dns"><span class="ci-num">08</span><span class="ci-name">DNS</span><span class="ci-count">15 tools</span></a>
-      <a href="#routes"><span class="ci-num">09</span><span class="ci-name">Routes</span><span class="ci-count">14 tools</span></a>
-      <a href="#firewall"><span class="ci-num">10</span><span class="ci-name">Firewall</span><span class="ci-count">9 tools</span></a>
-      <a href="#nat"><span class="ci-num">11</span><span class="ci-name">NAT</span><span class="ci-count">8 tools</span></a>
-      <a href="#wireguard"><span class="ci-num">12</span><span class="ci-name">WireGuard</span><span class="ci-count">15 tools</span></a>
-      <a href="#wireless"><span class="ci-num">13</span><span class="ci-name">Wireless</span><span class="ci-count">18 tools</span></a>
-      <a href="#queue"><span class="ci-num">14</span><span class="ci-name">Queues</span><span class="ci-count">19 tools</span></a>
-      <a href="#users"><span class="ci-num">15</span><span class="ci-name">Users</span><span class="ci-count">18 tools</span></a>
-      <a href="#backup"><span class="ci-num">16</span><span class="ci-name">Backup &amp; Export</span><span class="ci-count">10 tools</span></a>
-      <a href="#logs"><span class="ci-num">17</span><span class="ci-name">Logs</span><span class="ci-count">10 tools</span></a>
-      <a href="#safe-mode"><span class="ci-num">18</span><span class="ci-name">Safe Mode</span><span class="ci-count">4 tools</span></a>
+      <a href="#inventory"><span class="ci-num">01</span><span class="ci-name">Inventory</span><span class="ci-count">1 tool</span></a>
+      <a href="#interfaces"><span class="ci-num">02</span><span class="ci-name">Interfaces</span><span class="ci-count">4 tools</span></a>
+      <a href="#poe"><span class="ci-num">03</span><span class="ci-name">PoE</span><span class="ci-count">3 tools</span></a>
+      <a href="#vlan"><span class="ci-num">04</span><span class="ci-name">VLAN</span><span class="ci-count">5 tools</span></a>
+      <a href="#ip-address"><span class="ci-num">05</span><span class="ci-name">IP Address</span><span class="ci-count">4 tools</span></a>
+      <a href="#ipv6-address"><span class="ci-num">06</span><span class="ci-name">IPv6 Address</span><span class="ci-count">4 tools</span></a>
+      <a href="#ip-pool"><span class="ci-num">07</span><span class="ci-name">IP Pool</span><span class="ci-count">7 tools</span></a>
+      <a href="#dhcp"><span class="ci-num">08</span><span class="ci-name">DHCP</span><span class="ci-count">6 tools</span></a>
+      <a href="#dns"><span class="ci-num">09</span><span class="ci-name">DNS</span><span class="ci-count">15 tools</span></a>
+      <a href="#routes"><span class="ci-num">10</span><span class="ci-name">Routes</span><span class="ci-count">14 tools</span></a>
+      <a href="#firewall"><span class="ci-num">11</span><span class="ci-name">Firewall</span><span class="ci-count">9 tools</span></a>
+      <a href="#nat"><span class="ci-num">12</span><span class="ci-name">NAT</span><span class="ci-count">8 tools</span></a>
+      <a href="#wireguard"><span class="ci-num">13</span><span class="ci-name">WireGuard</span><span class="ci-count">15 tools</span></a>
+      <a href="#wireless"><span class="ci-num">14</span><span class="ci-name">Wireless</span><span class="ci-count">18 tools</span></a>
+      <a href="#queue"><span class="ci-num">15</span><span class="ci-name">Queues</span><span class="ci-count">19 tools</span></a>
+      <a href="#users"><span class="ci-num">16</span><span class="ci-name">Users</span><span class="ci-count">18 tools</span></a>
+      <a href="#backup"><span class="ci-num">17</span><span class="ci-name">Backup &amp; Export</span><span class="ci-count">10 tools</span></a>
+      <a href="#logs"><span class="ci-num">18</span><span class="ci-name">Logs</span><span class="ci-count">10 tools</span></a>
+      <a href="#safe-mode"><span class="ci-num">19</span><span class="ci-name">Safe Mode</span><span class="ci-count">4 tools</span></a>
     </div>
-    <!-- ============ 01 INTERFACES ============ -->
+    <!-- ============ 01 INVENTORY ============ -->
+    <div class="section-hd">
+      <div>
+        <h2 id="inventory">Inventory — Multiple Devices</h2>
+        <p class="section-intro">Manage a whole fleet from one server. Devices are declared in a
+          <strong>YAML inventory</strong>; each entry has a unique <code>title</code>, and every
+          device-scoped tool accepts an optional <code>device</code> argument naming the title to
+          target. With no inventory configured the server behaves exactly as before — a single device
+          built from <code>MIKROTIK_HOST</code> / <code>MIKROTIK_USERNAME</code> / …, and
+          <code>device</code> can be omitted everywhere.</p>
+        <span class="prefix-note none">no <code>mikrotik_</code> prefix on this category · read-only</span>
+      </div>
+      <div class="meta"><b>1</b> tool<br>category 01</div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-head">
+        <span class="verb read">list</span>
+        <span class="tname">list_devices</span>
+      </div>
+      <div class="tool-body">
+        <p>Lists the devices this server manages — title, host, port, username, tags, and region.
+          <strong>Credentials are never returned.</strong> Use it to discover the fleet before
+          targeting a device.</p>
+        <div class="params"><div class="row"><span class="pname">—</span><span class="pkind">no params</span><span class="pdesc">Takes no arguments</span></div></div>
+        <div class="ex">
+<span class="lbl">Fleet pattern</span><span class="fn">list_devices</span>()                                  <span class="c"># discover the fleet</span>
+<span class="fn">list_interfaces</span>(<span class="key">device</span>=<span class="str">"office-core"</span>)      <span class="c"># target one device</span>
+<span class="fn">create_vlan_interface</span>(<span class="key">device</span>=<span class="str">"branch-berlin"</span>, <span class="key">name</span>=<span class="str">"vlan100"</span>, <span class="key">vlan_id</span>=<span class="num">100</span>, <span class="key">interface</span>=<span class="str">"ether1"</span>)
+        </div>
+      </div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-head">
+        <span class="verb update">configure</span>
+        <span class="tname">Configuring the inventory</span>
+      </div>
+      <div class="tool-body">
+        <p>The inventory is YAML, from one of two sources —
+          <code>MIKROTIK_INVENTORY_FILE</code> (path to a YAML file, recommended) or
+          <code>MIKROTIK_INVENTORY</code> (the inventory written inline; YAML flow syntax needs no
+          escaped quotes, and plain JSON works too since it's a YAML subset). When both are set,
+          <strong>the inline value wins</strong>. A broken inventory (missing file, bad YAML, invalid
+          entry) stops the server at startup with one clear message. A ready-to-copy template ships at
+          the repository root as <a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/inventory.example.yml" target="_blank" rel="noopener"><code>inventory.example.yml</code></a>.</p>
+        <div class="ex">
+<span class="lbl">inventory.yaml</span><span class="c">- title: office-core</span>
+<span class="c">  host: 192.168.88.1</span>
+<span class="c">  port: 22</span>
+<span class="c">  username: admin</span>
+<span class="c">  password: change-me</span>
+<span class="c">  tags: [office, core]</span>
+<span class="c">  region: NL</span>
+<span class="c">- title: branch-berlin</span>
+<span class="c">  host: 10.20.0.1</span>
+<span class="c">  username: admin</span>
+<span class="c">  key_filename: /config/keys/id_ed25519</span>
+<span class="c">  tags: [branch]</span>
+<span class="c">  region: DE</span>
+        </div>
+        <div class="params">
+          <div class="row"><span class="pname">title</span><span class="pkind req">required</span><span class="pdesc">Unique identifier passed as <code>device</code> — matching is case-insensitive</span></div>
+          <div class="row"><span class="pname">host</span><span class="pkind req">required</span><span class="pdesc">IP or hostname</span></div>
+          <div class="row"><span class="pname">port · username</span><span class="pkind">optional</span><span class="pdesc">Defaults: <code>22</code>, <code>admin</code></span></div>
+          <div class="row"><span class="pname">password · key_filename</span><span class="pkind">optional</span><span class="pdesc">Prefer an SSH key over a password; omit <code>password</code> when using a key</span></div>
+          <div class="row"><span class="pname">tags · region</span><span class="pkind">optional</span><span class="pdesc">Free-form labels — <code>[branch, eu]</code>, <code>NL</code> — great targets for "every device tagged office" prompts</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-head">
+        <span class="verb read">select</span>
+        <span class="tname">Selecting a device</span>
+      </div>
+      <div class="tool-body">
+        <p>Every device-scoped tool takes an optional <code>device</code> argument.
+          <strong>One device configured</strong> — omit it; that device is used automatically.
+          <strong>More than one</strong> — pass the <code>title</code>. Omitting it, or passing an
+          unknown title, returns an error that lists the valid titles, so an AI caller corrects
+          itself on the next call instead of quietly running the command on the wrong router.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="icon">DOCKER</span>
+      <div>
+        In the container, the inventory file <strong>must be mounted as a volume</strong> — the image
+        ships <code>/config</code> as the mount point:
+        <code>-v "$PWD/inventory.yaml:/config/inventory.yaml:ro" -e MIKROTIK_INVENTORY_FILE=/config/inventory.yaml</code>.
+        Two traps the entrypoint catches with an explicit error: the container runs as
+        <strong>uid&nbsp;1000</strong>, so the file must be readable by that uid
+        (<code>chmod 644</code> is usually enough); and if the host file doesn't exist at start,
+        Docker silently creates a <em>directory</em> in its place — create the YAML first. The
+        entrypoint also accepts <code>--inventory '&lt;yaml&gt;'</code> / <code>--inventory-file &lt;path&gt;</code>.
+        When an inventory is configured it wins, and <code>MIKROTIK_HOST</code> /
+        <code>MIKROTIK_USERNAME</code> / <code>MIKROTIK_PASSWORD</code> / <code>MIKROTIK_PORT</code>
+        are ignored. See <a href="index.html#inventory-docker">Installation</a>.
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="icon">BEHAVIOR</span>
+      <div>
+        <strong>Connections are per command</strong> — every command opens its own SSH connection and
+        closes it when done, so parallel client sessions can't disturb each other; the trade-off is
+        one SSH handshake per command. <strong>Safe mode is per device</strong> — each device holds
+        its own persistent session, so <code>enable_safe_mode(device="office-core")</code> leaves
+        every other device untouched. <strong>The inventory is a secret</strong> — it holds fleet
+        credentials, so prefer <code>key_filename</code>, restrict file permissions, and remember
+        env values show in <code>docker inspect</code>. Validation errors never echo inventory
+        contents, so a typo can't leak a password into a log. For a local two-device lab,
+        <code>routeros-docker/docker-compose.yml</code> starts <code>routeros-a</code> (SSH
+        <code>127.0.0.1:2222</code>) and <code>routeros-b</code> (<code>:2223</code>).
+      </div>
+    </div>
+
+    <!-- ============ 02 INTERFACES ============ -->
     <div class="section-hd">
       <div>
         <h2 id="interfaces">Interfaces — All Interface Types</h2>
@@ -260,7 +381,7 @@
           categories (VLAN, WireGuard, Wireless).</p>
         <span class="prefix-note none">no <code>mikrotik_</code> prefix on this category</span>
       </div>
-      <div class="meta"><b>4</b> tools<br>category 01</div>
+      <div class="meta"><b>4</b> tools<br>category 02</div>
     </div>
 
     <div class="tool">
@@ -317,7 +438,7 @@
       </div>
     </div>
 
-    <!-- ============ 02 POE ============ -->
+    <!-- ============ 03 POE ============ -->
     <div class="section-hd">
       <div>
         <h2 id="poe">PoE — Power over Ethernet</h2>
@@ -327,7 +448,7 @@
           available.</p>
         <span class="prefix-note none">no <code>mikrotik_</code> prefix on this category · read-only</span>
       </div>
-      <div class="meta"><b>3</b> tools<br>category 02</div>
+      <div class="meta"><b>3</b> tools<br>category 03</div>
     </div>
 
     <div class="tool">
@@ -383,14 +504,14 @@
       </div>
     </div>
 
-    <!-- ============ 03 VLAN ============ -->
+    <!-- ============ 04 VLAN ============ -->
     <div class="section-hd">
       <div>
         <h2 id="vlan">VLAN — Tagged Interfaces</h2>
         <p class="section-intro">Create, list, inspect, update, and remove tagged 802.1Q interfaces. Parent
           interfaces can be any physical port or bridge.</p>
       </div>
-      <div class="meta"><b>5</b> tools<br>category 03</div>
+      <div class="meta"><b>5</b> tools<br>category 04</div>
     </div>
 
     <div class="tool">
@@ -494,14 +615,14 @@
       </div>
     </div>
 
-    <!-- ============ 04 IP ADDRESS ============ -->
+    <!-- ============ 05 IP ADDRESS ============ -->
     <div class="section-hd">
       <div>
         <h2 id="ip-address">IP Address — IPv4 Interface Bindings</h2>
         <p class="section-intro">Assign and remove IPv4 addresses on physical, bridge, or VLAN interfaces.
           For IPv6, see <a href="#ipv6-address">IPv6 Address</a>.</p>
       </div>
-      <div class="meta"><b>4</b> tools<br>category 04</div>
+      <div class="meta"><b>4</b> tools<br>category 05</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">add</span><span class="tname">mikrotik_add_ip_address</span></div>
       <div class="tool-body"><p>Bind an address to an interface.</p>
@@ -522,7 +643,7 @@
       <div class="tool-body"><div class="params"><div class="row"><span class="pname">address_id</span><span class="pkind req">required</span><span class="pdesc">RouterOS address record ID</span></div></div></div>
     </div>
 
-    <!-- ============ 05 IPV6 ADDRESS ============ -->
+    <!-- ============ 06 IPV6 ADDRESS ============ -->
     <div class="section-hd">
       <div>
         <h2 id="ipv6-address">IPv6 Address — Interface Bindings</h2>
@@ -533,7 +654,7 @@
           IPv6 routing, firewall, DHCPv6/ND, and pools are separate areas.</p>
         <span class="prefix-note none">no <code>mikrotik_</code> prefix on this category</span>
       </div>
-      <div class="meta"><b>4</b> tools<br>category 05</div>
+      <div class="meta"><b>4</b> tools<br>category 06</div>
     </div>
 
     <div class="tool">
@@ -615,14 +736,14 @@
       </div>
     </div>
 
-    <!-- ============ 06 IP POOL ============ -->
+    <!-- ============ 07 IP POOL ============ -->
     <div class="section-hd">
       <div>
         <h2 id="ip-pool">IP Pool — Named Address Pools</h2>
         <p class="section-intro">Named ranges used by DHCP, hotspot, PPP, and VPN servers.
           Pools can be inspected, updated, and expanded without disruption.</p>
       </div>
-      <div class="meta"><b>7</b> tools<br>category 06</div>
+      <div class="meta"><b>7</b> tools<br>category 07</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">create</span><span class="tname">mikrotik_create_ip_pool</span></div>
       <div class="tool-body"><div class="params">
@@ -646,14 +767,14 @@
       <div class="tool-body"><p>Remove a pool. Servers using it will refuse new leases.</p></div>
     </div>
 
-    <!-- ============ 07 DHCP ============ -->
+    <!-- ============ 08 DHCP ============ -->
     <div class="section-hd">
       <div>
         <h2 id="dhcp">DHCP — Pools, Networks, Servers</h2>
         <p class="section-intro">Three-piece model: a <em>pool</em> defines the address range,
           a <em>network</em> defines gateway and DNS, and a <em>server</em> binds them to an interface.</p>
       </div>
-      <div class="meta"><b>6</b> tools<br>category 07</div>
+      <div class="meta"><b>6</b> tools<br>category 08</div>
     </div>
     <div class="tool">
       <div class="tool-head">
@@ -677,7 +798,7 @@
     <div class="tool"><div class="tool-head"><span class="verb delete">remove</span><span class="tname">mikrotik_remove_dhcp_server</span></div>
       <div class="tool-body"><p>Removes a DHCP server. The underlying pool and network records survive.</p></div>
     </div>
-    <!-- ============ 08 DNS ============ -->
+    <!-- ============ 09 DNS ============ -->
     <div class="section-hd">
       <div>
         <h2 id="dns">DNS — Resolution &amp; Static Records</h2>
@@ -685,7 +806,7 @@
           A/CNAME/MX/SRV/TXT records, regex blocklists, and inspect or flush the cache.
           Run live test queries with <code>mikrotik_test_dns_query</code>.</p>
       </div>
-      <div class="meta"><b>15</b> tools<br>category 08</div>
+      <div class="meta"><b>15</b> tools<br>category 09</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">create</span><span class="tname">mikrotik_set_dns_servers · mikrotik_add_dns_static · mikrotik_add_dns_regexp</span></div>
       <div class="tool-body"><p>Configure upstream resolvers, add static records, and define regex-based blocklists.
@@ -712,14 +833,14 @@
       <div class="tool-body"><div class="params"><div class="row"><span class="pname">entry_id</span><span class="pkind req">required</span><span class="pdesc">Static record ID</span></div></div></div>
     </div>
 
-    <!-- ============ 09 ROUTES ============ -->
+    <!-- ============ 10 ROUTES ============ -->
     <div class="section-hd">
       <div>
         <h2 id="routes">Routes — Routing Table</h2>
         <p class="section-intro">Add static, default, and blackhole routes. Inspect active routes,
           check the path to a destination, dump routing tables, and read the route cache and statistics.</p>
       </div>
-      <div class="meta"><b>14</b> tools<br>category 09</div>
+      <div class="meta"><b>14</b> tools<br>category 10</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">create</span><span class="tname">mikrotik_add_route · mikrotik_add_default_route · mikrotik_add_blackhole_route</span></div>
       <div class="tool-body"><p>Three flavors of route creation. <code>add_route</code> takes <code>dst_address</code> +
@@ -741,7 +862,7 @@
       <div class="tool-body"><div class="params"><div class="row"><span class="pname">route_id</span><span class="pkind req">required</span><span class="pdesc">RouterOS route ID</span></div></div></div>
     </div>
 
-    <!-- ============ 10 FIREWALL ============ -->
+    <!-- ============ 11 FIREWALL ============ -->
     <div class="section-hd">
       <div>
         <h2 id="firewall">Firewall — Filter Rules</h2>
@@ -749,7 +870,7 @@
           and <code>output</code> chains. Includes rule ordering, enable/disable, and basic
           firewall scaffolding.</p>
       </div>
-      <div class="meta"><b>9</b> tools<br>category 10</div>
+      <div class="meta"><b>9</b> tools<br>category 11</div>
     </div>
 
     <div class="tool">
@@ -809,14 +930,14 @@
       </div>
     </div>
 
-    <!-- ============ 11 NAT ============ -->
+    <!-- ============ 12 NAT ============ -->
     <div class="section-hd">
       <div>
         <h2 id="nat">NAT — Translation Rules</h2>
         <p class="section-intro">Source-NAT (masquerade) for outbound, destination-NAT (port forwarding)
           for inbound, plus rule ordering and toggle.</p>
       </div>
-      <div class="meta"><b>8</b> tools<br>category 11</div>
+      <div class="meta"><b>8</b> tools<br>category 12</div>
     </div>
     <div class="tool">
       <div class="tool-head">
@@ -857,7 +978,7 @@
     <div class="tool"><div class="tool-head"><span class="verb delete">remove</span><span class="tname">mikrotik_remove_nat_rule</span></div>
       <div class="tool-body"><div class="params"><div class="row"><span class="pname">rule_id</span><span class="pkind req">required</span><span class="pdesc">Rule ID</span></div></div></div>
     </div>
-    <!-- ============ 12 WIREGUARD ============ -->
+    <!-- ============ 13 WIREGUARD ============ -->
     <div class="section-hd">
       <div>
         <h2 id="wireguard">WireGuard — Tunnels &amp; Peers</h2>
@@ -865,7 +986,7 @@
           and generate ready-to-paste client configs. The interface's public key is returned by
           <code>get_wireguard_interface</code> — hand it to clients. WireGuard requires RouterOS v7+.</p>
       </div>
-      <div class="meta"><b>15</b> tools<br>category 12</div>
+      <div class="meta"><b>15</b> tools<br>category 13</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">create</span><span class="tname">mikrotik_create_wireguard_interface</span></div>
       <div class="tool-body"><p>Stands up a WireGuard interface. If no private key is supplied, one is generated; read the
@@ -943,7 +1064,7 @@
       </div>
     </div>
 
-    <!-- ============ 13 WIRELESS ============ -->
+    <!-- ============ 14 WIRELESS ============ -->
     <div class="section-hd">
       <div>
         <h2 id="wireless">Wireless — WiFi Interfaces &amp; Security</h2>
@@ -951,7 +1072,7 @@
           Call <code>check_wireless_support</code> first — wireless tooling depends on the device's
           RouterOS wireless package.</p>
       </div>
-      <div class="meta"><b>18</b> tools<br>category 13</div>
+      <div class="meta"><b>18</b> tools<br>category 14</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">interface create</span><span class="tname">mikrotik_create_wireless_interface</span></div>
       <div class="tool-body"><p>Creates / configures a wireless interface (SSID, band, channel, mode, and an attached security profile).</p>
@@ -983,7 +1104,7 @@
       </div>
     </div>
 
-    <!-- ============ 14 QUEUES ============ -->
+    <!-- ============ 15 QUEUES ============ -->
     <div class="section-hd">
       <div>
         <h2 id="queue">Queues — Traffic Shaping</h2>
@@ -991,7 +1112,7 @@
           policies, and queue types for the underlying discipline (CAKE, fq-codel, SFQ, RED, PCQ, …).</p>
         <span class="prefix-note none">no <code>mikrotik_</code> prefix on this category</span>
       </div>
-      <div class="meta"><b>19</b> tools<br>category 14</div>
+      <div class="meta"><b>19</b> tools<br>category 15</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">simple queue</span><span class="tname">create_simple_queue · list_simple_queues · get_simple_queue · update_simple_queue · remove_simple_queue · enable_simple_queue · disable_simple_queue</span></div>
       <div class="tool-body"><p>Per-target rate limits — the simplest way to throttle a host or subnet. <code>max_limit</code> takes
@@ -1013,14 +1134,14 @@
         can't be modified or removed.</p>
       </div>
     </div>
-    <!-- ============ 15 USERS ============ -->
+    <!-- ============ 16 USERS ============ -->
     <div class="section-hd">
       <div>
         <h2 id="users">Users — Accounts, Groups &amp; SSH Keys</h2>
         <p class="section-intro">Local users, groups, policies, active sessions, and SSH key management.
           Used to provision scoped accounts for tooling rather than sharing <code>admin</code>.</p>
       </div>
-      <div class="meta"><b>18</b> tools<br>category 15</div>
+      <div class="meta"><b>18</b> tools<br>category 16</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">create</span><span class="tname">mikrotik_add_user · mikrotik_add_user_group</span></div>
       <div class="tool-body"><p>Create users and permission groups. Groups take a <code>policy</code> list (e.g. <code>read,write,ssh</code>).</p>
@@ -1045,14 +1166,14 @@
       <div class="tool-body"><p>Remove a user or a group.</p></div>
     </div>
 
-    <!-- ============ 16 BACKUP ============ -->
+    <!-- ============ 17 BACKUP ============ -->
     <div class="section-hd">
       <div>
         <h2 id="backup">Backup &amp; Export — Configuration State</h2>
         <p class="section-intro">Binary backups, RouterOS <code>.rsc</code> exports, section dumps,
           file transfer, restore, and import.</p>
       </div>
-      <div class="meta"><b>10</b> tools<br>category 16</div>
+      <div class="meta"><b>10</b> tools<br>category 17</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">create</span><span class="tname">mikrotik_create_backup · mikrotik_create_export · mikrotik_export_section</span></div>
       <div class="tool-body"><p>Three formats: a binary <code>.backup</code> (full snapshot), a <code>.rsc</code> export (declarative,
@@ -1073,14 +1194,14 @@
       <div class="tool-body"><p>Removes any file from the device's filesystem.</p></div>
     </div>
 
-    <!-- ============ 17 LOGS ============ -->
+    <!-- ============ 18 LOGS ============ -->
     <div class="section-hd">
       <div>
         <h2 id="logs">Logs — System Events</h2>
         <p class="section-intro">Stream and analyze RouterOS logs by topic, severity, or free-text search.
           Pull system events and security logs, aggregate statistics, live-tail, and export to CSV.</p>
       </div>
-      <div class="meta"><b>10</b> tools<br>category 17</div>
+      <div class="meta"><b>10</b> tools<br>category 18</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb read">read</span><span class="tname">mikrotik_get_logs · mikrotik_get_logs_by_severity · mikrotik_get_logs_by_topic · mikrotik_search_logs · mikrotik_get_system_events · mikrotik_get_security_logs · mikrotik_get_log_statistics</span></div>
       <div class="tool-body"><p>Seven lenses on the log buffer — by topic, by severity
@@ -1097,7 +1218,7 @@
       <div class="tool-body"><p>Clears the in-memory log buffer. Doesn't affect file-backed logs.</p></div>
     </div>
 
-    <!-- ============ 18 SAFE MODE ============ -->
+    <!-- ============ 19 SAFE MODE ============ -->
     <div class="section-hd">
       <div>
         <h2 id="safe-mode">Safe Mode — Atomic Sessions</h2>
@@ -1106,7 +1227,7 @@
           firewall or connectivity rules remotely.</p>
         <span class="prefix-note none">no <code>mikrotik_</code> prefix on this category · no parameters</span>
       </div>
-      <div class="meta"><b>4</b> tools<br>category 18</div>
+      <div class="meta"><b>4</b> tools<br>category 19</div>
     </div>
     <div class="callout">
       <span class="icon">HOW IT WORKS</span>
@@ -1118,7 +1239,7 @@
         writing the pending changes to flash/NVRAM and closing the session; <code>rollback_safe_mode</code>
         simply <strong>drops the session</strong> (no Ctrl+X), so RouterOS reverts everything. Pending
         changes live in memory only — a <strong>router reboot</strong>, not just a dropped connection, also
-        reverts them. Concurrent calls are serialised through an internal lock, so parallel requests are safe.
+        reverts them. Concurrent calls are serialised through an internal lock, so parallel requests are safe. With an <a href="#inventory">inventory</a>, safe mode is tracked <strong>per device</strong> — enabling it on one router leaves the others untouched.
       </div>
     </div>
 
@@ -1170,24 +1291,25 @@
   <aside class="toc">
     <h6>Categories</h6>
     <ul>
-      <li><a href="#interfaces">01 — Interfaces</a></li>
-      <li><a href="#poe">02 — PoE</a></li>
-      <li><a href="#vlan">03 — VLAN</a></li>
-      <li><a href="#ip-address">04 — IP Address</a></li>
-      <li><a href="#ipv6-address">05 — IPv6 Address</a></li>
-      <li><a href="#ip-pool">06 — IP Pool</a></li>
-      <li><a href="#dhcp">07 — DHCP</a></li>
-      <li><a href="#dns">08 — DNS</a></li>
-      <li><a href="#routes">09 — Routes</a></li>
-      <li><a href="#firewall">10 — Firewall</a></li>
-      <li><a href="#nat">11 — NAT</a></li>
-      <li><a href="#wireguard">12 — WireGuard</a></li>
-      <li><a href="#wireless">13 — Wireless</a></li>
-      <li><a href="#queue">14 — Queues</a></li>
-      <li><a href="#users">15 — Users</a></li>
-      <li><a href="#backup">16 — Backup</a></li>
-      <li><a href="#logs">17 — Logs</a></li>
-      <li><a href="#safe-mode">18 — Safe Mode</a></li>
+      <li><a href="#inventory">01 — Inventory</a></li>
+      <li><a href="#interfaces">02 — Interfaces</a></li>
+      <li><a href="#poe">03 — PoE</a></li>
+      <li><a href="#vlan">04 — VLAN</a></li>
+      <li><a href="#ip-address">05 — IP Address</a></li>
+      <li><a href="#ipv6-address">06 — IPv6 Address</a></li>
+      <li><a href="#ip-pool">07 — IP Pool</a></li>
+      <li><a href="#dhcp">08 — DHCP</a></li>
+      <li><a href="#dns">09 — DNS</a></li>
+      <li><a href="#routes">10 — Routes</a></li>
+      <li><a href="#firewall">11 — Firewall</a></li>
+      <li><a href="#nat">12 — NAT</a></li>
+      <li><a href="#wireguard">13 — WireGuard</a></li>
+      <li><a href="#wireless">14 — Wireless</a></li>
+      <li><a href="#queue">15 — Queues</a></li>
+      <li><a href="#users">16 — Users</a></li>
+      <li><a href="#backup">17 — Backup</a></li>
+      <li><a href="#logs">18 — Logs</a></li>
+      <li><a href="#safe-mode">19 — Safe Mode</a></li>
     </ul>
   </aside>
 </div>

@@ -162,6 +162,18 @@
     <h2 id="basics">Basic operations</h2>
     <p>Single-tool calls grouped by category. Copy any block and swap in your own names, addresses, and IDs.</p>
 
+    <div class="ex-sub">Multiple devices (inventory)</div>
+    <div class="code-header"><span># discover the fleet, target a device by title</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="c"># List the devices this server manages (titles, hosts, tags — never credentials)</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">list_devices</span> <span class="k">--tool-args</span> <span class="s">'{}'</span>
+
+<span class="c"># With an inventory configured, every tool takes an optional "device" (the inventory title)</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">list_interfaces</span> <span class="k">--tool-args</span> <span class="s">'{"device": "office-core"}'</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">mikrotik_create_vlan_interface</span> \
+    <span class="k">--tool-args</span> <span class="s">'{"device": "branch-berlin", "name": "vlan100", "vlan_id": 100, "interface": "ether1"}'</span>
+
+<span class="c"># Single-device setups need no change — omit "device" and the one device is used</span></pre>
+
     <div class="ex-sub">VLAN interfaces</div>
     <div class="code-header"><span># create · list · get · update · remove</span><button class="copy-btn">Copy</button></div>
     <pre class="code"><span class="c"># Create a VLAN interface</span>

@@ -221,6 +221,8 @@
         <tr><td><code class="mono">MIKROTIK_USERNAME</code></td><td>SSH username</td><td><code class="mono">admin</code></td></tr>
         <tr><td><code class="mono">MIKROTIK_PASSWORD</code></td><td>SSH password</td><td><em style="color:var(--ink-mute)">(empty)</em></td></tr>
         <tr><td><code class="mono">MIKROTIK_PORT</code></td><td>SSH port</td><td><code class="mono">22</code></td></tr>
+        <tr><td><code class="mono">MIKROTIK_INVENTORY</code></td><td>Multiple devices, written inline in YAML (or its JSON subset). Takes precedence over <code>MIKROTIK_INVENTORY_FILE</code> and the four variables above — see <a href="reference.html#inventory">Inventory</a>.</td><td><em style="color:var(--ink-mute)">(empty)</em></td></tr>
+        <tr><td><code class="mono">MIKROTIK_INVENTORY_FILE</code></td><td>Path <strong>inside the container</strong> to a YAML inventory file — mount it as a volume</td><td><em style="color:var(--ink-mute)">(empty)</em></td></tr>
         <tr><td><code class="mono">MIKROTIK_MCP__TRANSPORT</code></td><td>Transport — <code>stdio</code> · <code>sse</code> · <code>streamable-http</code></td><td><code class="mono">stdio</code></td></tr>
         <tr><td><code class="mono">MIKROTIK_MCP__HOST</code></td><td>HTTP listen address</td><td><code class="mono">0.0.0.0</code></td></tr>
         <tr><td><code class="mono">MIKROTIK_MCP__PORT</code></td><td>HTTP listen port</td><td><code class="mono">8000</code></td></tr>
@@ -264,6 +266,71 @@
     <p style="font-size:13.5px;color:var(--ink-mute)">Reachable at <code>http://localhost:8000/mcp</code>
       (streamable HTTP) or <code>/sse</code> (if you set <code>MIKROTIK_MCP__TRANSPORT: sse</code>), and
       <code>GET http://localhost:8000/health</code> returns <code>OK</code>.</p>
+
+    <h3 id="inventory-docker">Managing several devices</h3>
+    <p>To manage a fleet, give the container an <strong>inventory</strong> instead of the four
+      single-device variables. The inventory is a YAML file on your host, and it <strong>must be
+      mounted into the container as a volume</strong> — the image ships <code>/config</code> as the
+      mount point. A mounted file is also the safer channel: unlike an environment variable, its
+      contents do not show up in <code>docker inspect</code>. A ready-to-copy template ships at the
+      repository root as
+      <a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/inventory.example.yml" target="_blank" rel="noopener"><code>inventory.example.yml</code></a>.</p>
+
+    <div class="code-header"><span>inventory.yaml</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="k">- title</span>: office-core
+  <span class="k">host</span>: 192.168.88.1
+  <span class="k">port</span>: 22
+  <span class="k">username</span>: admin
+  <span class="k">password</span>: <span class="s">change-me</span>
+  <span class="k">region</span>: NL
+  <span class="k">tags</span>: [branch]
+
+<span class="k">- title</span>: branch-berlin
+  <span class="k">host</span>: 192.168.89.1
+  <span class="k">username</span>: admin
+  <span class="k">key_filename</span>: /config/keys/id_ed25519</pre>
+
+    <div class="code-header"><span># docker run with the mounted inventory</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="p">$</span> docker run <span class="k">--rm -i</span> \
+    <span class="k">-v</span> <span class="s">"$PWD/inventory.yaml:/config/inventory.yaml:ro"</span> \
+    <span class="k">-e</span> MIKROTIK_INVENTORY_FILE=<span class="s">/config/inventory.yaml</span> \
+    ghcr.io/jeff-nasseri/mikrotik-mcp:latest</pre>
+
+    <div class="code-header"><span>docker-compose.yml — fleet variant</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="k">services</span>:
+  <span class="k">mikrotik-mcp</span>:
+    <span class="k">image</span>: ghcr.io/jeff-nasseri/mikrotik-mcp:latest
+    <span class="k">restart</span>: unless-stopped
+    <span class="k">ports</span>:
+      - <span class="s">"8000:8000"</span>
+    <span class="k">volumes</span>:
+      - <span class="s">./inventory.yaml:/config/inventory.yaml:ro</span>
+    <span class="k">environment</span>:
+      MIKROTIK_INVENTORY_FILE: <span class="s">"/config/inventory.yaml"</span>
+      MIKROTIK_MCP__TRANSPORT: <span class="s">"streamable-http"</span>
+      MIKROTIK_MCP__HOST: <span class="s">"0.0.0.0"</span>
+      MIKROTIK_MCP__PORT: <span class="s">"8000"</span></pre>
+
+    <p>If a mount is inconvenient, the inventory can go inline in <code>MIKROTIK_INVENTORY</code>
+      using YAML flow syntax (no escaped quotes; JSON also works, since it is a YAML subset), or via
+      the <code>--inventory</code> / <code>--inventory-file</code> entrypoint arguments. Inline always
+      wins over the file. When an inventory is set it takes precedence and <code>MIKROTIK_HOST</code> /
+      <code>MIKROTIK_USERNAME</code> / <code>MIKROTIK_PASSWORD</code> / <code>MIKROTIK_PORT</code> are
+      ignored — the entrypoint also stops applying its <code>192.168.88.1</code> default. Tools then
+      take a <code>device</code> argument naming the title to target; see the
+      <a href="reference.html#inventory">Inventory reference</a>.</p>
+
+    <div class="callout">
+      <span class="icon">TRAPS</span>
+      <div>
+        Two mistakes the entrypoint catches with an explicit error rather than starting a server with
+        no devices: the container runs as <strong>uid&nbsp;1000</strong> (<code>mcpuser</code>), so the
+        mounted file must be readable by that uid — <code>chmod 644 inventory.yaml</code> is usually
+        enough; and if <code>inventory.yaml</code> does not exist on the host when the container
+        starts, Docker silently creates a <em>directory</em> in its place — create the file before
+        starting the container.
+      </div>
+    </div>
 
     <h3 id="reverse-proxy">Behind a reverse proxy</h3>
     <p>The HTTP transports apply DNS-rebinding protection by validating the request's <code>Host</code>
@@ -373,7 +440,7 @@
 
     <!-- CONTEXT -->
     <h2 id="context">Context length optimization</h2>
-    <p>MikroTik MCP ships <strong>173 tools</strong>. At full verbosity the tool schema can occupy
+    <p>MikroTik MCP ships <strong>174 tools</strong>. At full verbosity the tool schema can occupy
       <strong>≈ 54,000 tokens</strong> — more than the entire context window of many local LLMs
       (LM Studio, Ollama, and similar).</p>
 
@@ -434,6 +501,7 @@
       <li><a href="#sse-docker">— SSE / HTTP</a></li>
       <li><a href="#env">— Env variables</a></li>
       <li><a href="#compose">— Docker Compose</a></li>
+      <li><a href="#inventory-docker">— Multiple devices</a></li>
       <li><a href="#reverse-proxy">— Reverse proxy</a></li>
       <li><a href="#manual">Manual install</a></li>
       <li><a href="#cli">— CLI options</a></li>
