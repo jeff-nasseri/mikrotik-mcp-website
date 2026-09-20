@@ -361,9 +361,26 @@ to prevent command parsing errors on RouterOS devices</pre>
 Add tests for user group management and permission validation</pre>
 
     <!-- PULL REQUEST -->
+    <h2 id="branching">Branching strategy</h2>
+    <p>Branches for new pull requests carry the issue number they address:</p>
+    <div class="code-header"><span># branch name format</span><button class="copy-btn">Copy</button></div>
+    <pre class="code">&lt;type&gt;/issue-&lt;number&gt;-&lt;short-description&gt;</pre>
+    <ul>
+      <li><code>&lt;type&gt;</code> is one of the conventional commit types above (<code>feat</code>, <code>fix</code>, <code>docs</code>, …)</li>
+      <li><code>&lt;number&gt;</code> is the GitHub issue number the branch addresses</li>
+      <li>when the change has <strong>no issue</strong>, put <code>#</code> in place of the number</li>
+      <li><code>&lt;short-description&gt;</code> is a few kebab-case words describing the change</li>
+    </ul>
+    <div class="code-header"><span># examples</span><button class="copy-btn">Copy</button></div>
+    <pre class="code">feat/issue-123-branch-one
+fix/issue-#-branch-two</pre>
+    <p>This makes every branch self-documenting: the type tells reviewers what kind of change to
+      expect, and the issue number links the work back to its context (or <code>#</code> states
+      explicitly that no issue exists, rather than leaving reviewers to search for one).</p>
+
     <h2 id="pull-request">Submitting a pull request</h2>
     <ol>
-      <li><strong>Fork the repository</strong> and create your feature branch from <code>master</code></li>
+      <li><strong>Fork the repository</strong> and create your feature branch from <code>master</code>, named according to the <a href="#branching">branching strategy</a> above</li>
       <li><strong>Implement your changes</strong> following the guidelines above</li>
       <li><strong>Run all tests</strong> to ensure nothing is broken</li>
       <li><strong>Test with MCP Inspector</strong> to verify tools work correctly</li>
@@ -423,6 +440,7 @@ Add tests for user group management and permission validation</pre>
       <li><a href="#transport">Transport modes</a></li>
       <li><a href="#guidelines">Dev guidelines</a></li>
       <li><a href="#commits">Commit format</a></li>
+      <li><a href="#branching">Branching strategy</a></li>
       <li><a href="#pull-request">Pull request</a></li>
       <li><a href="#help">Getting help</a></li>
       <li><a href="#code-review">Code review</a></li>

@@ -262,6 +262,25 @@
 <span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">mikrotik_expand_ip_pool</span> \
     <span class="k">--tool-args</span> <span class="s">'{"name": "main-pool", "additional_ranges": "192.168.1.201-192.168.1.250"}'</span></pre>
 
+    <div class="ex-sub">IPv6 firewall filter rules</div>
+    <div class="code-header"><span># icmpv6, NDP and an SSH allow (no mikrotik_ prefix)</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="c"># Accept ICMPv6 — required for IPv6 to work at all</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">create_ipv6_filter_rule</span> \
+    <span class="k">--tool-args</span> <span class="s">'{"chain": "input", "action": "accept", "protocol": "icmpv6"}'</span>
+
+<span class="c"># Allow SSH from a trusted prefix</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">create_ipv6_filter_rule</span> \
+    <span class="k">--tool-args</span> <span class="s">'{"chain": "input", "action": "accept", "protocol": "tcp", "dst_port": "22", "src_address": "2001:db8::/64"}'</span>
+
+<span class="c"># NDP router solicitation, hop-limit 255</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">create_ipv6_filter_rule</span> \
+    <span class="k">--tool-args</span> <span class="s">'{"chain": "input", "action": "accept", "protocol": "icmpv6", "icmp_options": "133:0", "hop_limit": "equal:255"}'</span>
+
+<span class="c"># List, then reorder / toggle by internal id (*N — not the positional number)</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">list_ipv6_filter_rules</span> <span class="k">--tool-args</span> <span class="s">'{"chain_filter": "input"}'</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">move_ipv6_filter_rule</span> <span class="k">--tool-args</span> <span class="s">'{"rule_id": "*3", "destination": 0}'</span>
+<span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">disable_ipv6_filter_rule</span> <span class="k">--tool-args</span> <span class="s">'{"rule_id": "*3"}'</span></pre>
+
     <div class="ex-sub">Firewall filter rules</div>
     <div class="code-header"><span># baseline input chain</span><button class="copy-btn">Copy</button></div>
     <pre class="code"><span class="c"># Accept established/related, drop invalid, allow ICMP</span>
@@ -415,11 +434,11 @@
 
 <span class="c"># 4. Export just the firewall filter table</span>
 <span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">mikrotik_export_section</span> \
-    <span class="k">--tool-args</span> <span class="s">'{"section": "/ip/firewall/filter", "name": "firewall_backup"}'</span>
+    <span class="k">--tool-args</span> <span class="s">'{"section": "ip firewall filter"}'</span>
 
 <span class="c"># 5. Export just the NAT table</span>
 <span class="p">$</span> uv run mcp-cli cmd <span class="k">--server</span> <span class="s">mikrotik</span> <span class="k">--tool</span> <span class="s">mikrotik_export_section</span> \
-    <span class="k">--tool-args</span> <span class="s">'{"section": "/ip/firewall/nat", "name": "nat_backup"}'</span></pre>
+    <span class="k">--tool-args</span> <span class="s">'{"section": "ip firewall nat"}'</span></pre>
     </div>
 
     <h3 id="wifi" style="scroll-margin-top:90px; margin-top:42px;">WiFi network setups</h3>

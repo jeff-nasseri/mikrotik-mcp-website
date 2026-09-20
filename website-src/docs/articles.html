@@ -177,7 +177,18 @@
       <a class="btn" style="margin-left:8px" href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/docs/articles/managing-a-mikrotik-fleet.md" target="_blank" rel="noopener">Read in the repo ↗</a>
     </div>
 
-    <!-- ============ 20 PRACTICAL EXAMPLES ============ -->
+    <h3 id="diagrams" style="margin-top:34px">Diagrams</h3>
+    <p>The repository also documents itself visually: <a href="https://github.com/jeff-nasseri/mikrotik-mcp/tree/master/docs/diagrams" target="_blank" rel="noopener"><code>docs/diagrams</code></a>
+      holds <a href="https://www.drawio.com/" target="_blank" rel="noopener">draw.io</a> sources that live
+      next to the code they describe, so a pull request can change the drawing in the same commit.
+      <a href="https://github.com/jeff-nasseri/mikrotik-mcp/blob/master/docs/diagrams/Inventory.drawio" target="_blank" rel="noopener"><code>Inventory.drawio</code></a>
+      maps the multi-device architecture: the LLM calls a tool, the tool passes a device
+      <code>title</code> to the connector, the inventory resolves that title to the device's SSH
+      client, and the command runs on the selected router. GitHub doesn't render <code>.drawio</code>
+      inline — open it with <a href="https://app.diagrams.net/" target="_blank" rel="noopener">app.diagrams.net</a>,
+      draw.io Desktop, or the VS Code Draw.io Integration extension.</p>
+
+    <!-- ============ 25 PRACTICAL EXAMPLES ============ -->
     <h2 id="examples">25 practical examples</h2>
     <p>Common network scenarios for developers learning to drive MikroTik devices through the MCP
       tools. Each card shows the prompt you'd give the AI and the equivalent RouterOS CLI commands
@@ -913,6 +924,7 @@
     <h6>On this page</h6>
     <ul>
       <li><a href="#learning">Learning resources</a></li>
+      <li><a href="#diagrams">— Diagrams</a></li>
       <li><a href="#examples">25 practical examples</a></li>
       <li><a href="#ex1">1 · Guest VLAN</a></li>
       <li><a href="#ex2">2 · IoT VLAN 50</a></li>

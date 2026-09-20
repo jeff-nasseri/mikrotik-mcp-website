@@ -329,7 +329,7 @@
       </h1>
       <p class="lede">
         MikroTik MCP is the bridge between your AI assistant and your RouterOS fleet — let Claude, ChatGPT, or any
-        MCP-capable client manage VLANs, firewall rules, DHCP, NAT, WireGuard, and 14 other categories from a single
+        MCP-capable client manage VLANs, IPv4 and IPv6 firewall rules, DHCP, NAT, WireGuard, and 15 other categories from a single
         prompt — on one router or across a whole fleet. No web UI clicks. No Winbox tabs.
       </p>
       <div class="hero-ctas">
@@ -340,8 +340,8 @@
         </a>
       </div>
       <div class="meta-row">
-        <div><b>19</b> tool categories</div>
-        <div><b>170+</b> RouterOS tools</div>
+        <div><b>20</b> tool categories</div>
+        <div><b>185</b> RouterOS tools</div>
         <div><b>3</b> transports (stdio · SSE · HTTP)</div>
         <div><b>MIT</b> licensed</div>
       </div>
@@ -465,7 +465,7 @@
     <div class="band-head">
       <div>
         <div class="eyebrow">02 — Capabilities</div>
-        <h2>19 categories. Roughly everything you'd touch in Winbox.</h2>
+        <h2>20 categories. Roughly everything you'd touch in Winbox.</h2>
       </div>
       <p>Each category exposes typed tools — create, list, get, update, remove, plus category-specific
         verbs like <span style="color:var(--amber);font-family:var(--mono);font-size:13px">move_filter_rule</span>
@@ -485,6 +485,12 @@
         <span class="count">9 tools</span>
         <h4>Firewall</h4>
         <p>Filter rules across input, forward, output chains. Move, enable, disable, plus a basic-setup helper.</p>
+      </a>
+      <a class="cap" href="docs/reference.html#ipv6-firewall">
+        <svg class="cap-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/><path d="M8.5 11.5h7M12 8v7"/></svg>
+        <span class="count">8 tools</span>
+        <h4>IPv6 Firewall</h4>
+        <p>Filter rules under <code>/ipv6 firewall</code> — icmpv6, hop-limit, extension headers, address types.</p>
       </a>
       <a class="cap" href="docs/reference.html#nat">
         <svg class="cap-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8h16M4 12h16M4 16h10"/><circle cx="20" cy="16" r="2"/></svg>
