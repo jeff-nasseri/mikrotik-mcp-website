@@ -221,6 +221,8 @@
         <tr><td><code class="mono">MIKROTIK_USERNAME</code></td><td>SSH username</td><td><code class="mono">admin</code></td></tr>
         <tr><td><code class="mono">MIKROTIK_PASSWORD</code></td><td>SSH password</td><td><em style="color:var(--ink-mute)">(empty)</em></td></tr>
         <tr><td><code class="mono">MIKROTIK_PORT</code></td><td>SSH port</td><td><code class="mono">22</code></td></tr>
+        <tr><td><code class="mono">MIKROTIK_READ_ONLY</code></td><td><code>true</code> exposes only tools that don't modify RouterOS or its file store</td><td><code class="mono">false</code></td></tr>
+        <tr><td><code class="mono">MIKROTIK_SENSITIVE_HIDING</code></td><td><code>true</code> redacts recognized credentials and private key material</td><td><code class="mono">false</code></td></tr>
         <tr><td><code class="mono">MIKROTIK_INVENTORY</code></td><td>Multiple devices, written inline in YAML (or its JSON subset). Takes precedence over <code>MIKROTIK_INVENTORY_FILE</code> and the four variables above — see <a href="reference.html#inventory">Inventory</a>.</td><td><em style="color:var(--ink-mute)">(empty)</em></td></tr>
         <tr><td><code class="mono">MIKROTIK_INVENTORY_FILE</code></td><td>Path <strong>inside the container</strong> to a YAML inventory file — mount it as a volume</td><td><em style="color:var(--ink-mute)">(empty)</em></td></tr>
         <tr><td><code class="mono">MIKROTIK_MCP__TRANSPORT</code></td><td>Transport — <code>stdio</code> · <code>sse</code> · <code>streamable-http</code></td><td><code class="mono">stdio</code></td></tr>
@@ -228,6 +230,7 @@
         <tr><td><code class="mono">MIKROTIK_MCP__PORT</code></td><td>HTTP listen port</td><td><code class="mono">8000</code></td></tr>
         <tr><td><code class="mono">MIKROTIK_MCP__ALLOWED_HOSTS</code></td><td>Comma-separated <code>Host</code>-header allowlist for the HTTP transports (DNS-rebinding protection). Append <code>:*</code> to allow any port; set <code>*</code> to disable the check.</td><td><em style="color:var(--ink-mute)">(empty)</em></td></tr>
         <tr><td><code class="mono">MIKROTIK_MCP__ALLOWED_ORIGINS</code></td><td>Comma-separated <code>Origin</code>-header allowlist for the HTTP transports.</td><td><em style="color:var(--ink-mute)">(empty)</em></td></tr>
+        <tr><td><code class="mono">MIKROTIK_MCP__ALLOWED_IPS</code></td><td>Comma-separated client IP addresses and CIDR networks allowed to use the HTTP transports — see <a href="#allowed-ips">Restricting client IPs</a>.</td><td><em style="color:var(--ink-mute)">(empty; unrestricted)</em></td></tr>
       </tbody>
     </table>
 
@@ -332,6 +335,55 @@
       </div>
     </div>
 
+    <h3 id="hardening">Read-only and sensitive-hiding modes</h3>
+    <p>Two flags narrow what the server exposes, independently of the RouterOS account you connect with.</p>
+    <div class="code-header"><span># both also available as MIKROTIK_READ_ONLY / MIKROTIK_SENSITIVE_HIDING</span><button class="copy-btn">Copy</button></div>
+    <pre class="code"><span class="p">$</span> mcp-server-mikrotik <span class="k">--read-only</span>
+<span class="p">$</span> mcp-server-mikrotik <span class="k">--sensitive-hiding</span></pre>
+    <p><strong><code>--read-only</code></strong> keeps modifying tools out of the MCP tool catalogue
+      entirely. It limits the <em>catalogue only</em> — use a restricted RouterOS account for actual
+      write protection; that account is the enforcement layer if another SSH client or a server defect
+      bypasses the catalogue.</p>
+    <p><strong><code>--sensitive-hiding</code></strong> redacts recognized passwords, passphrases,
+      private and preshared keys, authentication and encryption keys, tokens, secrets, and SNMP
+      communities from tool results, MCP notifications, exceptions, and server logs. It also omits
+      <code>download_file</code> and <code>generate_wireguard_client_config</code>, whose payloads can't
+      be safely field-redacted, and stops export tools from using RouterOS <code>show-sensitive</code>.
+      Public keys, addresses, usernames, and SSIDs stay visible.</p>
+    <div class="callout">
+      <span class="icon">LIMIT</span>
+      <div>
+        Redaction recognises <em>labelled</em> secrets. Arbitrary unlabelled secrets sitting in
+        free-form log messages or comments can't be identified reliably, so don't treat
+        <code>--sensitive-hiding</code> as a guarantee that nothing sensitive can ever reach a client.
+      </div>
+    </div>
+
+    <h3 id="allowed-ips">Restricting client IP addresses</h3>
+    <p><code>MIKROTIK_MCP__ALLOWED_IPS</code> limits <strong>all</strong> HTTP endpoints — <code>/mcp</code>,
+      <code>/sse</code>, <code>/messages/</code>, and <code>/health</code> — to specific IPv4 or IPv6
+      addresses and networks. Requests from anywhere else get <strong>HTTP 403</strong>. Leave it unset to
+      keep access unrestricted. Entries are validated at startup, and CIDRs must use a network address —
+      <code>10.0.0.0/8</code>, not <code>10.0.0.1/8</code>.</p>
+    <div class="code-header"><span>docker-compose.yml</span><button class="copy-btn">Copy</button></div>
+    <pre class="code">    <span class="k">environment</span>:
+      MIKROTIK_MCP__TRANSPORT: <span class="s">"streamable-http"</span>
+      MIKROTIK_MCP__ALLOWED_IPS: <span class="s">"192.168.1.50, 10.20.0.0/16, 2001:db8::/48"</span></pre>
+    <p>The allowlist uses the client address supplied by Uvicorn. For direct connections nothing else is
+      needed. Behind a reverse proxy, set Uvicorn's <code>FORWARDED_ALLOW_IPS</code> to the proxy address
+      or network so the allowlist sees the original address from <code>X-Forwarded-For</code>:</p>
+    <div class="code-header"><span># trust only your proxy</span><button class="copy-btn">Copy</button></div>
+    <pre class="code">    <span class="k">environment</span>:
+      MIKROTIK_MCP__ALLOWED_IPS: <span class="s">"192.168.1.0/24"</span>
+      FORWARDED_ALLOW_IPS: <span class="s">"172.18.0.0/16"</span></pre>
+    <div class="callout">
+      <span class="icon">SECURITY</span>
+      <div>
+        Only trust addresses your proxy controls. Setting <code>FORWARDED_ALLOW_IPS=*</code> lets direct
+        clients spoof their source address through forwarded headers, which defeats the allowlist.
+      </div>
+    </div>
+
     <h3 id="reverse-proxy">Behind a reverse proxy</h3>
     <p>The HTTP transports apply DNS-rebinding protection by validating the request's <code>Host</code>
       header. When the server is reached on a custom domain or non-localhost IP — e.g. through a reverse
@@ -385,6 +437,9 @@
         <tr><td><code class="mono">--password</code></td><td>SSH password</td><td>from config</td></tr>
         <tr><td><code class="mono">--key-filename</code></td><td>SSH key file (preferred over password)</td><td>from config</td></tr>
         <tr><td><code class="mono">--port</code></td><td>SSH port</td><td><code class="mono">22</code></td></tr>
+        <tr><td><code class="mono">--read-only</code></td><td>Expose only tools that don't modify RouterOS or its file store</td><td><code class="mono">false</code></td></tr>
+        <tr><td><code class="mono">--sensitive-hiding</code></td><td>Redact credentials and private key material from client-visible output</td><td><code class="mono">false</code></td></tr>
+        <tr><td><code class="mono">--mcp.allowed-ips</code></td><td>Comma-separated client IPs / CIDR networks allowed to use the HTTP transports</td><td><em style="color:var(--ink-mute)">(empty)</em></td></tr>
         <tr><td><code class="mono">--mcp.transport</code></td><td><code>stdio</code> · <code>sse</code> · <code>streamable-http</code></td><td><code class="mono">stdio</code></td></tr>
         <tr><td><code class="mono">--mcp.host</code></td><td>HTTP listen address</td><td><code class="mono">0.0.0.0</code></td></tr>
         <tr><td><code class="mono">--mcp.port</code></td><td>HTTP listen port</td><td><code class="mono">8000</code></td></tr>
@@ -440,7 +495,7 @@
 
     <!-- CONTEXT -->
     <h2 id="context">Context length optimization</h2>
-    <p>MikroTik MCP ships <strong>185 tools</strong>. At full verbosity the tool schema can occupy
+    <p>MikroTik MCP ships <strong>192 tools</strong>. At full verbosity the tool schema can occupy
       <strong>≈ 54,000 tokens</strong> — more than the entire context window of many local LLMs
       (LM Studio, Ollama, and similar).</p>
 
@@ -502,6 +557,8 @@
       <li><a href="#env">— Env variables</a></li>
       <li><a href="#compose">— Docker Compose</a></li>
       <li><a href="#inventory-docker">— Multiple devices</a></li>
+      <li><a href="#hardening">— Read-only / redaction</a></li>
+      <li><a href="#allowed-ips">— Client IP allowlist</a></li>
       <li><a href="#reverse-proxy">— Reverse proxy</a></li>
       <li><a href="#manual">Manual install</a></li>
       <li><a href="#cli">— CLI options</a></li>

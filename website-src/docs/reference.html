@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <meta name="theme-color" content="#0a0d12" />
 <title>API Reference — MikroTik MCP docs</title>
-<meta name="description" content="Complete API reference for the MikroTik MCP server — 180+ tools across 20 categories: a multi-device inventory, interfaces, PoE, VLAN, IPv4 and IPv6 addressing, IPv4 and IPv6 firewalls, DHCP, DNS, routes, firewall, NAT, WireGuard, wireless, queues, users, backup, logs, and safe mode." />
+<meta name="description" content="Complete API reference for the MikroTik MCP server — 190+ tools across 21 categories: a multi-device inventory, interfaces, PoE, VLAN, IPv4 and IPv6 addressing, IPv4 and IPv6 firewalls, address lists, DHCP, DNS, routes, firewall, NAT, WireGuard, wireless, queues, users, backup, logs, and safe mode." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -217,14 +217,14 @@
     </div>
     <h1 class="doc-title">API reference</h1>
     <p class="doc-lede">
-      Every tool the server exposes, grouped into <strong>20 categories</strong> (185 tools total). Each
+      Every tool the server exposes, grouped into <strong>21 categories</strong> (192 tools total). Each
       entry shows the name, what it does, its parameters (required vs optional), and a canonical example.
     </p>
     <p class="doc-lede" style="font-size:15px;">
       <strong>Naming convention.</strong> Most tools are prefixed with <code>mikrotik_</code> followed by a
       verb — <code>create</code>, <code>list</code>, <code>get</code>, <code>update</code>,
-      <code>remove</code>, plus category-specific verbs. Seven categories are exceptions:
-      <strong>Inventory</strong>, <strong>Interfaces</strong>, <strong>PoE</strong>, <strong>IPv6&nbsp;Address</strong>, <strong>IPv6&nbsp;Firewall</strong>, <strong>Queues</strong>, and <strong>Safe Mode</strong> tools are called
+      <code>remove</code>, plus category-specific verbs. Eight categories are exceptions:
+      <strong>Inventory</strong>, <strong>Interfaces</strong>, <strong>PoE</strong>, <strong>IPv6&nbsp;Address</strong>, <strong>IPv6&nbsp;Firewall</strong>, <strong>Address&nbsp;Lists</strong>, <strong>Queues</strong>, and <strong>Safe Mode</strong> tools are called
       <em>without</em> the prefix (e.g. <code>list_interfaces</code>, <code>create_simple_queue</code>,
       <code>enable_safe_mode</code>). The category headers below flag which convention applies. With a multi-device
       <a href="#inventory">inventory</a> configured, every device-scoped tool also accepts an optional
@@ -245,14 +245,15 @@
       <a href="#routes"><span class="ci-num">10</span><span class="ci-name">Routes</span><span class="ci-count">14 tools</span></a>
       <a href="#firewall"><span class="ci-num">11</span><span class="ci-name">Firewall</span><span class="ci-count">9 tools</span></a>
       <a href="#ipv6-firewall"><span class="ci-num">12</span><span class="ci-name">IPv6 Firewall</span><span class="ci-count">8 tools</span></a>
-      <a href="#nat"><span class="ci-num">13</span><span class="ci-name">NAT</span><span class="ci-count">8 tools</span></a>
-      <a href="#wireguard"><span class="ci-num">14</span><span class="ci-name">WireGuard</span><span class="ci-count">15 tools</span></a>
-      <a href="#wireless"><span class="ci-num">15</span><span class="ci-name">Wireless</span><span class="ci-count">19 tools</span></a>
-      <a href="#queue"><span class="ci-num">16</span><span class="ci-name">Queues</span><span class="ci-count">19 tools</span></a>
-      <a href="#users"><span class="ci-num">17</span><span class="ci-name">Users</span><span class="ci-count">18 tools</span></a>
-      <a href="#backup"><span class="ci-num">18</span><span class="ci-name">Backup &amp; Export</span><span class="ci-count">10 tools</span></a>
-      <a href="#logs"><span class="ci-num">19</span><span class="ci-name">Logs</span><span class="ci-count">10 tools</span></a>
-      <a href="#safe-mode"><span class="ci-num">20</span><span class="ci-name">Safe Mode</span><span class="ci-count">4 tools</span></a>
+      <a href="#address-list"><span class="ci-num">13</span><span class="ci-name">Address Lists</span><span class="ci-count">7 tools</span></a>
+      <a href="#nat"><span class="ci-num">14</span><span class="ci-name">NAT</span><span class="ci-count">8 tools</span></a>
+      <a href="#wireguard"><span class="ci-num">15</span><span class="ci-name">WireGuard</span><span class="ci-count">15 tools</span></a>
+      <a href="#wireless"><span class="ci-num">16</span><span class="ci-name">Wireless</span><span class="ci-count">19 tools</span></a>
+      <a href="#queue"><span class="ci-num">17</span><span class="ci-name">Queues</span><span class="ci-count">19 tools</span></a>
+      <a href="#users"><span class="ci-num">18</span><span class="ci-name">Users</span><span class="ci-count">18 tools</span></a>
+      <a href="#backup"><span class="ci-num">19</span><span class="ci-name">Backup &amp; Export</span><span class="ci-count">10 tools</span></a>
+      <a href="#logs"><span class="ci-num">20</span><span class="ci-name">Logs</span><span class="ci-count">10 tools</span></a>
+      <a href="#safe-mode"><span class="ci-num">21</span><span class="ci-name">Safe Mode</span><span class="ci-count">4 tools</span></a>
     </div>
     <!-- ============ 01 INVENTORY ============ -->
     <div class="section-hd">
@@ -909,7 +910,7 @@
           <div class="row"><span class="pname">in_interface · out_interface</span><span class="pkind">optional</span><span class="pdesc">Match by interface</span></div>
           <div class="row"><span class="pname">in_interface_list · out_interface_list</span><span class="pkind">optional</span><span class="pdesc">Match an <code>/interface list</code> (e.g. <code>"LAN"</code>, <code>"WAN"</code>) rather than a single interface</span></div>
           <div class="row"><span class="pname">connection_state</span><span class="pkind">optional</span><span class="pdesc">e.g. <code>"established,related"</code></span></div>
-          <div class="row"><span class="pname">src_address_list · dst_address_list</span><span class="pkind">optional</span><span class="pdesc">Named source / destination address lists</span></div>
+          <div class="row"><span class="pname">src_address_list · dst_address_list</span><span class="pkind">optional</span><span class="pdesc">Named source / destination <a href="#address-list">address lists</a></span></div>
           <div class="row"><span class="pname">connection_nat_state</span><span class="pkind">optional</span><span class="pdesc">Connection NAT state match</span></div>
           <div class="row"><span class="pname">tcp_flags · limit</span><span class="pkind">optional</span><span class="pdesc">TCP flag matches; rate limit</span></div>
           <div class="row"><span class="pname">comment · disabled</span><span class="pkind">optional</span><span class="pdesc">Description; create disabled</span></div>
@@ -1049,14 +1050,122 @@
       </div>
     </div>
 
-    <!-- ============ 13 NAT ============ -->
+    <!-- ============ 13 ADDRESS LISTS ============ -->
+    <div class="section-hd">
+      <div>
+        <h2 id="address-list">Address Lists — Named IP Sets</h2>
+        <p class="section-intro">Named address sets under <code>/ip firewall address-list</code> and
+          <code>/ipv6 firewall address-list</code>, referenced from filter rules via
+          <code>src_address_list</code> / <code>dst_address_list</code>. Unlike the filter scopes,
+          <strong>IPv4 and IPv6 share one set of tools</strong> — the entry schema is identical across
+          families, so each tool takes a required <code>family</code> of <code>"ipv4"</code> or
+          <code>"ipv6"</code> rather than duplicating seven tools per family.</p>
+        <span class="prefix-note none">no <code>mikrotik_</code> prefix on this category</span>
+      </div>
+      <div class="meta"><b>7</b> tools<br>category 13</div>
+    </div>
+
+    <div class="callout">
+      <span class="icon">BEHAVIOR</span>
+      <div>
+        Three things worth knowing before you use these.
+        <strong>IPv6 stores host entries with an explicit <code>/128</code></strong> — adding
+        <code>2001:db8::5</code> stores <code>2001:db8::5/128</code>, so a bare lookup wouldn't match;
+        these tools canonicalise the address for you, so either form works.
+        <strong>List names match exactly, including spaces</strong> — <code>"internal NS "</code> with a
+        trailing space is a different list from <code>"internal NS"</code>; nothing is trimmed.
+        <strong>A hostname entry creates dynamic children</strong> — <code>address=example.com</code> adds
+        one static entry plus one dynamic entry per resolved address (use <code>static_only</code> to
+        exclude them), and an entry with a <code>timeout</code> is likewise dynamic and does not survive
+        a reboot.
+      </div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-head">
+        <span class="verb create">create</span>
+        <span class="tname">create_address_list_entry</span>
+      </div>
+      <div class="tool-body">
+        <p>Adds an entry. Runs <code>/ip</code> or <code>/ipv6 firewall address-list add</code>.</p>
+        <div class="params">
+          <div class="row"><span class="pname">family</span><span class="pkind req">required</span><span class="pdesc"><code>"ipv4"</code> or <code>"ipv6"</code></span></div>
+          <div class="row"><span class="pname">list_name</span><span class="pkind req">required</span><span class="pdesc">List to add to — created implicitly if new</span></div>
+          <div class="row"><span class="pname">address</span><span class="pkind req">required</span><span class="pdesc">Address, prefix, or hostname</span></div>
+          <div class="row"><span class="pname">comment · timeout · disabled</span><span class="pkind">optional</span><span class="pdesc">Description; expiry such as <code>1h</code> (makes the entry dynamic); create disabled</span></div>
+        </div>
+        <div class="ex">
+<span class="lbl">Examples</span><span class="fn">create_address_list_entry</span>(<span class="key">family</span>=<span class="str">"ipv4"</span>, <span class="key">list_name</span>=<span class="str">"trusted"</span>, <span class="key">address</span>=<span class="str">"203.0.113.0/24"</span>)
+<span class="fn">create_address_list_entry</span>(<span class="key">family</span>=<span class="str">"ipv6"</span>, <span class="key">list_name</span>=<span class="str">"trusted"</span>, <span class="key">address</span>=<span class="str">"2001:db8::5"</span>)
+<span class="fn">create_address_list_entry</span>(<span class="key">family</span>=<span class="str">"ipv4"</span>, <span class="key">list_name</span>=<span class="str">"temp"</span>, <span class="key">address</span>=<span class="str">"203.0.113.9"</span>, <span class="key">timeout</span>=<span class="str">"1h"</span>)
+        </div>
+      </div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-head">
+        <span class="verb read">list · get</span>
+        <span class="tname">list_address_list_entries · get_address_list_entry</span>
+      </div>
+      <div class="tool-body">
+        <p>List entries with optional filters, or fetch one by list name and address.</p>
+        <div class="params">
+          <div class="row"><span class="pname">family</span><span class="pkind req">required</span><span class="pdesc"><code>"ipv4"</code> or <code>"ipv6"</code></span></div>
+          <div class="row"><span class="pname">list_filter</span><span class="pkind">optional</span><span class="pdesc">Exact list name — trailing spaces included</span></div>
+          <div class="row"><span class="pname">address_filter · comment_filter</span><span class="pkind">optional</span><span class="pdesc">Partial match</span></div>
+          <div class="row"><span class="pname">disabled_only · dynamic_only · static_only</span><span class="pkind">optional</span><span class="pdesc">Narrow by entry state — <code>static_only</code> excludes hostname/timeout children</span></div>
+          <div class="row"><span class="pname">list_name · address</span><span class="pkind req">required for get</span><span class="pdesc">Locate the single entry</span></div>
+        </div>
+        <div class="ex">
+<span class="lbl">Examples</span><span class="fn">list_address_list_entries</span>(<span class="key">family</span>=<span class="str">"ipv4"</span>, <span class="key">list_filter</span>=<span class="str">"trusted"</span>, <span class="key">static_only</span>=<span class="num">true</span>)
+<span class="fn">list_address_list_entries</span>(<span class="key">family</span>=<span class="str">"ipv6"</span>, <span class="key">address_filter</span>=<span class="str">"2001:db8"</span>)
+<span class="fn">get_address_list_entry</span>(<span class="key">family</span>=<span class="str">"ipv6"</span>, <span class="key">list_name</span>=<span class="str">"trusted"</span>, <span class="key">address</span>=<span class="str">"2001:db8::5"</span>)
+        </div>
+      </div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-head">
+        <span class="verb update">update · toggle</span>
+        <span class="tname">update_address_list_entry · enable_address_list_entry · disable_address_list_entry</span>
+      </div>
+      <div class="tool-body">
+        <p>Edit an entry located by its current <code>list_name</code> + <code>address</code>, or toggle it
+          without removing it. <code>update</code> takes <code>new_list_name</code>, <code>comment</code>,
+          <code>timeout</code>, and <code>disabled</code> — pass <code>""</code> to clear
+          <code>comment</code> or <code>timeout</code>. The change is <strong>confirmed on the device</strong>
+          before success is reported: a refusal RouterOS phrases without the words "failure" or "error" —
+          a read-only account answers <code>not enough permissions (9)</code> — is reported as a failure
+          rather than a successful update.</p>
+        <div class="ex">
+<span class="lbl">Examples</span><span class="fn">update_address_list_entry</span>(<span class="key">family</span>=<span class="str">"ipv4"</span>, <span class="key">list_name</span>=<span class="str">"temp"</span>, <span class="key">address</span>=<span class="str">"203.0.113.9"</span>, <span class="key">new_list_name</span>=<span class="str">"trusted"</span>)
+<span class="fn">disable_address_list_entry</span>(<span class="key">family</span>=<span class="str">"ipv4"</span>, <span class="key">list_name</span>=<span class="str">"trusted"</span>, <span class="key">address</span>=<span class="str">"203.0.113.0/24"</span>)
+        </div>
+      </div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-head">
+        <span class="verb delete">remove</span>
+        <span class="tname">remove_address_list_entry</span>
+      </div>
+      <div class="tool-body">
+        <p>Removes the matching entry. Removing a <em>hostname</em> entry also clears the dynamic entries
+          RouterOS derived from it.</p>
+        <div class="ex">
+<span class="lbl">Example</span><span class="fn">remove_address_list_entry</span>(<span class="key">family</span>=<span class="str">"ipv4"</span>, <span class="key">list_name</span>=<span class="str">"trusted"</span>, <span class="key">address</span>=<span class="str">"203.0.113.0/24"</span>)
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 14 NAT ============ -->
     <div class="section-hd">
       <div>
         <h2 id="nat">NAT — Translation Rules</h2>
         <p class="section-intro">Source-NAT (masquerade) for outbound, destination-NAT (port forwarding)
           for inbound, plus rule ordering and toggle.</p>
       </div>
-      <div class="meta"><b>8</b> tools<br>category 13</div>
+      <div class="meta"><b>8</b> tools<br>category 14</div>
     </div>
     <div class="tool">
       <div class="tool-head">
@@ -1097,7 +1206,7 @@
     <div class="tool"><div class="tool-head"><span class="verb delete">remove</span><span class="tname">mikrotik_remove_nat_rule</span></div>
       <div class="tool-body"><div class="params"><div class="row"><span class="pname">rule_id</span><span class="pkind req">required</span><span class="pdesc">Rule ID</span></div></div></div>
     </div>
-    <!-- ============ 14 WIREGUARD ============ -->
+    <!-- ============ 15 WIREGUARD ============ -->
     <div class="section-hd">
       <div>
         <h2 id="wireguard">WireGuard — Tunnels &amp; Peers</h2>
@@ -1105,7 +1214,7 @@
           and generate ready-to-paste client configs. The interface's public key is returned by
           <code>get_wireguard_interface</code> — hand it to clients. WireGuard requires RouterOS v7+.</p>
       </div>
-      <div class="meta"><b>15</b> tools<br>category 14</div>
+      <div class="meta"><b>15</b> tools<br>category 15</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">create</span><span class="tname">mikrotik_create_wireguard_interface</span></div>
       <div class="tool-body"><p>Stands up a WireGuard interface. If no private key is supplied, one is generated; read the
@@ -1183,7 +1292,7 @@
       </div>
     </div>
 
-    <!-- ============ 15 WIRELESS ============ -->
+    <!-- ============ 16 WIRELESS ============ -->
     <div class="section-hd">
       <div>
         <h2 id="wireless">Wireless — WiFi Interfaces &amp; Security</h2>
@@ -1191,7 +1300,7 @@
           Call <code>check_wireless_support</code> first — wireless tooling depends on the device's
           RouterOS wireless package.</p>
       </div>
-      <div class="meta"><b>19</b> tools<br>category 15</div>
+      <div class="meta"><b>19</b> tools<br>category 16</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">interface create</span><span class="tname">mikrotik_create_wireless_interface</span></div>
       <div class="tool-body"><p>Creates / configures a wireless interface (SSID, band, channel, mode, and an attached security profile).</p>
@@ -1223,7 +1332,7 @@
       </div>
     </div>
 
-    <!-- ============ 16 QUEUES ============ -->
+    <!-- ============ 17 QUEUES ============ -->
     <div class="section-hd">
       <div>
         <h2 id="queue">Queues — Traffic Shaping</h2>
@@ -1231,7 +1340,7 @@
           policies, and queue types for the underlying discipline (CAKE, fq-codel, SFQ, RED, PCQ, …).</p>
         <span class="prefix-note none">no <code>mikrotik_</code> prefix on this category</span>
       </div>
-      <div class="meta"><b>19</b> tools<br>category 16</div>
+      <div class="meta"><b>19</b> tools<br>category 17</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">simple queue</span><span class="tname">create_simple_queue · list_simple_queues · get_simple_queue · update_simple_queue · remove_simple_queue · enable_simple_queue · disable_simple_queue</span></div>
       <div class="tool-body"><p>Per-target rate limits — the simplest way to throttle a host or subnet. <code>max_limit</code> takes
@@ -1253,14 +1362,14 @@
         can't be modified or removed.</p>
       </div>
     </div>
-    <!-- ============ 17 USERS ============ -->
+    <!-- ============ 18 USERS ============ -->
     <div class="section-hd">
       <div>
         <h2 id="users">Users — Accounts, Groups &amp; SSH Keys</h2>
         <p class="section-intro">Local users, groups, policies, active sessions, and SSH key management.
           Used to provision scoped accounts for tooling rather than sharing <code>admin</code>.</p>
       </div>
-      <div class="meta"><b>18</b> tools<br>category 17</div>
+      <div class="meta"><b>18</b> tools<br>category 18</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">create</span><span class="tname">mikrotik_add_user · mikrotik_add_user_group</span></div>
       <div class="tool-body"><p>Create users and permission groups. Groups take a <code>policy</code> list (e.g. <code>read,write,ssh</code>).</p>
@@ -1285,14 +1394,14 @@
       <div class="tool-body"><p>Remove a user or a group.</p></div>
     </div>
 
-    <!-- ============ 18 BACKUP ============ -->
+    <!-- ============ 19 BACKUP ============ -->
     <div class="section-hd">
       <div>
         <h2 id="backup">Backup &amp; Export — Configuration State</h2>
         <p class="section-intro">Binary backups, RouterOS <code>.rsc</code> exports, section dumps,
           file transfer, restore, and import.</p>
       </div>
-      <div class="meta"><b>10</b> tools<br>category 18</div>
+      <div class="meta"><b>10</b> tools<br>category 19</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb create">create</span><span class="tname">mikrotik_create_backup · mikrotik_create_export · mikrotik_export_section</span></div>
       <div class="tool-body"><p>Three formats: a binary <code>.backup</code> (full snapshot), a <code>.rsc</code> export (declarative,
@@ -1318,14 +1427,14 @@
       <div class="tool-body"><p>Removes any file from the device's filesystem.</p></div>
     </div>
 
-    <!-- ============ 19 LOGS ============ -->
+    <!-- ============ 20 LOGS ============ -->
     <div class="section-hd">
       <div>
         <h2 id="logs">Logs — System Events</h2>
         <p class="section-intro">Stream and analyze RouterOS logs by topic, severity, or free-text search.
           Pull system events and security logs, aggregate statistics, live-tail, and export to CSV.</p>
       </div>
-      <div class="meta"><b>10</b> tools<br>category 19</div>
+      <div class="meta"><b>10</b> tools<br>category 20</div>
     </div>
     <div class="tool"><div class="tool-head"><span class="verb read">read</span><span class="tname">mikrotik_get_logs · mikrotik_get_logs_by_severity · mikrotik_get_logs_by_topic · mikrotik_search_logs · mikrotik_get_system_events · mikrotik_get_security_logs · mikrotik_get_log_statistics</span></div>
       <div class="tool-body"><p>Seven lenses on the log buffer — by topic, by severity
@@ -1345,7 +1454,7 @@
       <div class="tool-body"><p>Clears the in-memory log buffer. Doesn't affect file-backed logs.</p></div>
     </div>
 
-    <!-- ============ 20 SAFE MODE ============ -->
+    <!-- ============ 21 SAFE MODE ============ -->
     <div class="section-hd">
       <div>
         <h2 id="safe-mode">Safe Mode — Atomic Sessions</h2>
@@ -1354,7 +1463,7 @@
           firewall or connectivity rules remotely.</p>
         <span class="prefix-note none">no <code>mikrotik_</code> prefix on this category · no parameters</span>
       </div>
-      <div class="meta"><b>4</b> tools<br>category 20</div>
+      <div class="meta"><b>4</b> tools<br>category 21</div>
     </div>
     <div class="callout">
       <span class="icon">HOW IT WORKS</span>
@@ -1430,14 +1539,15 @@
       <li><a href="#routes">10 — Routes</a></li>
       <li><a href="#firewall">11 — Firewall</a></li>
       <li><a href="#ipv6-firewall">12 — IPv6 Firewall</a></li>
-      <li><a href="#nat">13 — NAT</a></li>
-      <li><a href="#wireguard">14 — WireGuard</a></li>
-      <li><a href="#wireless">15 — Wireless</a></li>
-      <li><a href="#queue">16 — Queues</a></li>
-      <li><a href="#users">17 — Users</a></li>
-      <li><a href="#backup">18 — Backup</a></li>
-      <li><a href="#logs">19 — Logs</a></li>
-      <li><a href="#safe-mode">20 — Safe Mode</a></li>
+      <li><a href="#address-list">13 — Address Lists</a></li>
+      <li><a href="#nat">14 — NAT</a></li>
+      <li><a href="#wireguard">15 — WireGuard</a></li>
+      <li><a href="#wireless">16 — Wireless</a></li>
+      <li><a href="#queue">17 — Queues</a></li>
+      <li><a href="#users">18 — Users</a></li>
+      <li><a href="#backup">19 — Backup</a></li>
+      <li><a href="#logs">20 — Logs</a></li>
+      <li><a href="#safe-mode">21 — Safe Mode</a></li>
     </ul>
   </aside>
 </div>
